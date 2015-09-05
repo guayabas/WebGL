@@ -1,10 +1,234 @@
 ﻿<!--Alejandro Guayaquil-->
 <!--09.2015-->
+
+<!--Example to welcome the awesomeness of WebGL-->
+<!--I have few knowledge of layouts using HTML and CSS so I will-->
+<!--have to improve such skils for this project-->
+<!--The same goes for how to code nicely in Javascript-->
+
 <!DOCTYPE html>
 <html>
 <head>
+    <!--What else to put here?-->
+
+    <!--I remembered to seen that JS code-->
+    <!--is more efficient at the end of the body-->
+
+    <!--Fetch the math library-->
+    <script type="text/javascript" src="gl-matrix-min.js"></script>
+
+    <script id="shader-vs" type="x-shader/x-vertex">
+        attribute vec3 aVertexPosition;
+        attribute vec4 aVertexColor;
+
+        uniform mat4 uMV;
+        uniform mat4 uP;
+
+        varying vec4 vColor;
+
+        void main(void)
+        {
+            vColor = aVertexColor;
+            gl_Position = uP * uMV * vec4(aVertexPosition, 1.0);
+        }
+    </script>
+
+    <script id="shader-fs" type="x-shader/x-fragment">
+        precision mediump float;
+
+        varying vec4 vColor;
+
+        void main(void)
+        {
+            gl_FragColor = vColor;
+        }
+    </script>
+
+    <script type="text/javascript">
+        /// Create context and dimensions
+        var gl;
+
+        function initGL(canvas)
+        {
+            /// Do not pay attention to the try-catch block
+            /// In programming is a "way" of coding safe stuff
+            try
+            {
+                /// Search about the Context argument
+                /// http://www.w3schools.com/tags/ref_canvas.asp
+                gl = canvas.getContext("experimental-webgl");
+
+                /// Dimensions of where to display
+                gl.viewportHeight = canvas.height;
+                gl.viewportWidth = canvas.width;
+            }
+            catch(e)
+            {
+                alert("Not initialization available for WebGL");
+            }
+        }
+
+        /// Create shaders
+        var shaderProgram;
+
+        function initShaders()
+        {
+            /// Compilation
+            var vertexShaderContainer = document.getElementById("shader-vs");
+            var vertexShader;
+            
+            /// Extract raw text
+            var rawTextVertexShader = "";
+            var nodeVS = vertexShaderContainer.firstChild;
+            while (nodeVS)
+            {
+                /// nodeType 3???
+                if (nodeVS.nodeType == 3)
+                {
+                    rawTextVertexShader += nodeVS.textContent;
+                }
+                nodeVS = nodeVS.nextSibling;
+            }
+
+            vertexShader = gl.createShader(gl.VERTEX_SHADER);
+            gl.shaderSource(vertexShader, rawTextVertexShader);
+            gl.compileShader(vertexShader);
+
+            if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS))
+            {
+                alert(gl.getShaderInfoLog(vertexShader));
+            }
+
+            var fragmentShaderContainer = document.getElementById("shader-fs");
+            var fragmentShader;
+
+            /// Extract raw text
+            var rawTextFragmentShader = "";
+            var nodeFS = fragmentShaderContainer.firstChild;
+            while (nodeFS) {
+                /// nodeType 3???
+                if (nodeFS.nodeType == 3) {
+                    rawTextFragmentShader += nodeFS.textContent;
+                }
+                nodeFS = nodeFS.nextSibling;
+            }
+
+            fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+            gl.shaderSource(fragmentShader, rawTextFragmentShader);
+            gl.compileShader(fragmentShader);
+
+            if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS))
+            {
+                alert(gl.getShaderInfoLog(fragmentShader));
+            }
+
+            /// Linking
+            shaderProgram = gl.createProgram();
+            gl.attachShader(shaderProgram, fragmentShader);
+            gl.attachShader(shaderProgram, vertexShader);
+            gl.linkProgram(shaderProgram);
+
+            if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS))
+            {
+                alert("Linking error in shader");
+            }
+
+            gl.useProgram(shaderProgram);
+
+            /// Enable attributes
+            shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+            shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexColor");
+            gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+            gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
+
+            /// Fetch matrix locations
+            shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMV");
+            shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uP");
+        }
+
+        /// Usage of separate buffers
+        var vertexPositionBuffer;
+        var vertexColorBuffer;
+
+        function initBuffers()
+        {
+            /// raw 3D geometric data
+            vertexPositionBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+
+            var vertices = [-0.5, -0.5, 0.0, +0.5, -0.5, 0.0, 0.0, 0.5, 0.0];
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+            vertexPositionBuffer.itemSize = 3;
+            vertexPositionBuffer.numItems = 3;
+
+            /// raw RGBA color data
+            vertexColorBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer);
+
+            var colors = [1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0];
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+            vertexColorBuffer.itemSize = 4;
+            vertexColorBuffer.numItems = 3;
+        }
+
+        /// Math stuff
+        var projectionMatrix = mat4.create();
+        var modelviewMatrix = mat4.create();
+
+        function setMatrixUniforms()
+        {
+            gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, projectionMatrix);
+            gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, modelviewMatrix);
+        }
+
+        /// Draw objects
+        function drawScene()
+        {
+            gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+            /// Create perspective projection
+            mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, projectionMatrix);
+
+            /// Create modelview matrix
+            mat4.identity(modelviewMatrix);
+            
+            /// Bind buffers
+            gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+            gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer);
+            gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, vertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+            /// Set matrices in the GPU
+            setMatrixUniforms();
+
+            /// Finally, RENDER!
+            gl.drawArrays(gl.TRIANGLES, 0, vertexPositionBuffer.numItems);
+        }
+
+        /// Initializer
+        function WebGLInitializer()
+        {
+            var canvas = document.getElementById("ExampleAlejandro");
+            canvas.height = window.innerHeight;
+            canvas.width = window.innerWidth;
+
+            /// Prepare everything for the data required by WebGL
+            initGL(canvas);
+            initShaders();
+            initBuffers();
+
+            /// Launch
+            gl.clearColor(0.5, 0.5, 0.5, 1.0);
+            gl.enable(gl.DEPTH_TEST);
+            drawScene();
+        }
+
+    </script>
 </head>
-<body>
-Hello HTML
+<body onload="WebGLInitializer();">
+    <!--Our body, the beautiful stuff comes here-->
+    <canvas id="ExampleAlejandro"></canvas>
 </body>
 </html>
