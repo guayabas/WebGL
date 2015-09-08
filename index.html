@@ -17,32 +17,34 @@
     <!--Fetch the math library-->
     <script type="text/javascript" src="gl-matrix-min.js"></script>
 
-    <script id="shader-vs" type="x-shader/x-vertex">
-        attribute vec3 aVertexPosition;
-        attribute vec4 aVertexColor;
+    <!-- I am fetching the shaders as html containers so I am not -->
+    <!-- leaving blanks at the beginning -->
+<script id="shader-vs" type="x-shader/x-vertex">
+attribute vec3 aVertexPosition;
+attribute vec4 aVertexColor;
 
-        uniform mat4 uMV;
-        uniform mat4 uP;
+uniform mat4 uMV;
+uniform mat4 uP;
 
-        varying vec4 vColor;
+varying vec4 vColor;
 
-        void main(void)
-        {
-            vColor = aVertexColor;
-            gl_Position = uP * uMV * vec4(aVertexPosition, 1.0);
-        }
-    </script>
+void main(void)
+{
+    vColor = aVertexColor;
+    gl_Position = uP * uMV * vec4(aVertexPosition, 1.0);
+}
+</script>
 
-    <script id="shader-fs" type="x-shader/x-fragment">
-        precision mediump float;
+<script id="shader-fs" type="x-shader/x-fragment">
+precision mediump float;
 
-        varying vec4 vColor;
+varying vec4 vColor;
 
-        void main(void)
-        {
-            gl_FragColor = vColor;
-        }
-    </script>
+void main(void)
+{
+    gl_FragColor = vColor;
+}
+</script>
 
     <script type="text/javascript">
         /// Create context and dimensions
@@ -211,8 +213,8 @@
         function WebGLInitializer()
         {
             var canvas = document.getElementById("ExampleAlejandro");
-            canvas.height = window.innerHeight;
-            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight * 0.5;
+            canvas.width = window.innerWidth * 0.5;
 
             /// Prepare everything for the data required by WebGL
             initGL(canvas);
@@ -226,9 +228,51 @@
         }
 
     </script>
+
+    <style>
+        /*I need to take a look for the options in the CSS world*/
+        nav {
+            line-height:30px;
+            background-color:#eeeeee;
+            height:500px;
+            width:500px;
+            float:left;
+            padding:5px;	      
+        }
+        section {
+            width:450px;
+            float:left;
+            padding:10px;
+        }
+    </style>
+    
+    <!--So yeah ... -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            /// Works but the formatting is not nice, plus
+            /// editing is still not available
+            $("#inputVS").append($("#shader-vs").text());
+            $("#inputFS").append($("#shader-fs").text());
+        });
+    </script>
 </head>
 <body onload="WebGLInitializer();">
-    <!--Our body, the beautiful stuff comes here-->
-    <canvas id="ExampleAlejandro"></canvas>
+    <!-- The layout of the web page -->
+    <nav>
+        <!-- Vertex shader input -->
+        <section id="vsHTML">
+            <textarea type="text" cols="60" rows="15" id="inputVS"></textarea>
+        </section>
+        <!-- Fragment shader input -->
+        <section id="fsHTML">
+            <textarea type="text" cols="60" rows="10" id="inputFS"></textarea>
+        </section>
+        <button type="button">Compile</button>
+    </nav>
+    <section>
+        <!--Our body, the beautiful stuff comes here-->
+        <canvas id="ExampleAlejandro"></canvas>
+    </section>
 </body>
 </html>
