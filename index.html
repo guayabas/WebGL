@@ -9,13 +9,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!--What else to put here?-->
+    <title>WebGL Toy</title>
 
     <!--I remembered to seen that JS code-->
     <!--is more efficient at the end of the body-->
 
     <!--Fetch the math library-->
     <script type="text/javascript" src="gl-matrix-min.js"></script>
+
+    <!--jQuery-->
+    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
 
 <script id="shader-vs" type="x-shader/x-vertex">/// Alejandro Guayaquil 
 /// 09.2015 
@@ -62,6 +65,10 @@ void main(void)
     gl_FragColor = vColor;
 }</script>
 
+<script id="shader-gs" type="x-shader/x-geometry">/// Not active</script>
+<script id="shader-cs" type="x-shader/x-tessellationcontrol">/// Not active</script>
+<script id="shader-es" type="x-shader/x-tessellationevaluation">/// Not active</script>
+
     <script type="text/javascript">
         /// Create context and dimensions
         var shadersOK = false;
@@ -89,6 +96,8 @@ void main(void)
 
         /// Create shaders
         var shaderProgram;
+        var editorVS;
+        var editorFS;
 
         function loadShaders()
         {
@@ -98,10 +107,10 @@ void main(void)
 
             /// Extract vertex shader container from the textarea of the HTML
             vertexShaderContainer = document.getElementById("inputVS");
-         
+
             /// Here I am not sure if the member .value will be robust enough for a big project
             vertexShader = gl.createShader(gl.VERTEX_SHADER);
-            gl.shaderSource(vertexShader, vertexShaderContainer.value);
+            gl.shaderSource(vertexShader, editorVS.getValue());
             gl.compileShader(vertexShader);
 
             if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS))
@@ -119,7 +128,7 @@ void main(void)
 
             /// Here I am not sure if the member .value will be robust enough for a big project
             fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-            gl.shaderSource(fragmentShader, fragmentShaderContainer.value);
+            gl.shaderSource(fragmentShader, editorFS.getValue());
             gl.compileShader(fragmentShader);
 
             if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS))
@@ -227,7 +236,7 @@ void main(void)
         {
             if (document.getElementById("checkBoxAnimation").checked)
             {
-                /// I think I should add some condition to not exceed a huge number ... 
+                /// I think I should add some condition to not exceed a huge number ...
                 timeClientSite += 0.01;
             }
 
@@ -245,7 +254,7 @@ void main(void)
 
             /// Create modelview matrix
             mat4.identity(modelviewMatrix);
-            
+
             if (shadersOK)
             {
                 /// Bind buffers
@@ -298,14 +307,65 @@ void main(void)
 
             tick();
         }
+
+        $(document).ready(function () {
+            /// Works but the formatting is not nice, plus
+            /// editing is still not available
+            $("#inputVS").append($("#shader-vs").text());
+            $("#inputFS").append($("#shader-fs").text());
+            $("#inputGS").append($("#shader-gs").text());
+            $("#inputES").append($("#shader-es").text());
+            $("#inputCS").append($("#shader-cs").text());
+
+            /// Works the highlight and the editing on the fly
+            var textAreaVS = document.getElementById("inputVS");
+            editorVS = CodeMirror.fromTextArea(textAreaVS, {
+                mode: "text/x-csrc",
+                lineNumbers: true,
+                matchBrackets: true,
+            });
+            editorVS.setSize(450, 350);
+
+            var textAreaFS = document.getElementById("inputFS");
+            editorFS = CodeMirror.fromTextArea(textAreaFS, {
+                mode: "text/x-csrc",
+                lineNumbers: true,
+                matchBrackets: true
+            });
+            editorFS.setSize(450, 220);
+
+            var textAreaGS = document.getElementById("inputGS");
+            editorGS = CodeMirror.fromTextArea(textAreaGS, {
+                mode: "text/x-csrc",
+                lineNumbers: true,
+                matchBrackets: true
+            });
+            editorGS.setSize(450, 25);
+
+            var textAreaES = document.getElementById("inputES");
+            editorES = CodeMirror.fromTextArea(textAreaES, {
+                mode: "text/x-csrc",
+                lineNumbers: true,
+                matchBrackets: true
+            });
+            editorES.setSize(450, 25);
+
+            var textAreaCS = document.getElementById("inputCS");
+            editorCS = CodeMirror.fromTextArea(textAreaCS, {
+                mode: "text/x-csrc",
+                lineNumbers: true,
+                matchBrackets: true
+            });
+            editorCS.setSize(450, 25);
+        });
     </script>
 
     <style>
         /*I need to take a look for the options in the CSS world*/
         nav {
-            line-height:30px;
+            line-height:15px;
             background-color:#eeeeee;
-            height:750px;
+            height:850px;
             width:475px;
             float:left;
             padding:5px;	      
@@ -316,28 +376,34 @@ void main(void)
             padding:10px;
         }
     </style>
-    
-    <!--So yeah ... -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            /// Works but the formatting is not nice, plus
-            /// editing is still not available
-            $("#inputVS").append($("#shader-vs").text());
-            $("#inputFS").append($("#shader-fs").text());
-        });
-    </script>
 </head>
 <body onload="WebGLInitializer(false)">
     <!-- The layout of the web page -->
     <nav>
         <!-- Vertex shader input -->
         <section id="vsHTML">
-            <textarea type="text" cols="60" rows="29" id="inputVS"></textarea>
+            Vertex Shader
+            <textarea type="text" cols="60" id="inputVS"></textarea>
         </section>
         <!-- Fragment shader input -->
         <section id="fsHTML">
-            <textarea type="text" cols="60" rows="14" id="inputFS"></textarea>
+            Fragment Shader
+            <textarea type="text" cols="60" id="inputFS"></textarea>
+        </section>
+        <!-- Geometry shader input -->
+        <section id="gsHTML">
+            Geometry Shader
+            <textarea type="text" cols="60" id="inputGS"></textarea>
+        </section>
+        <!-- Tessellation control shader input -->
+        <section id="gsHTML">
+            Tessellation Control Shader
+            <textarea type="text" cols="60" id="inputCS"></textarea>
+        </section>
+        <!-- Tessellation evaluation shader input -->
+        <section id="gsHTML">
+            Tessellation Evaluation Shader
+            <textarea type="text" cols="60" id="inputES"></textarea>
         </section>
         Animation <input type="checkbox" id="checkBoxAnimation"/>
         <button type="button" style="float: right;" onclick="loadShaders()">Compile</button>
@@ -346,5 +412,12 @@ void main(void)
         <!--Our body, the beautiful stuff comes here-->
         <canvas id="ExampleAlejandro"></canvas>
     </section>
+
+    <!--Code syntax highlight-->
+    <!--http://codemirror.net/-->
+    <script src="codemirror/lib/codemirror.js"></script>
+    <script src="codemirror/addon/edit/matchbrackets.js"></script>
+    <link rel="stylesheet" href="codemirror/lib/codemirror.css">
+    <script src="codemirror/mode/clike/clike.js"></script>
 </body>
 </html>
