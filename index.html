@@ -17,37 +17,54 @@
     <!--Fetch the math library-->
     <script type="text/javascript" src="gl-matrix-min.js"></script>
 
-    <!-- I am fetching the shaders as html containers so I am not -->
-    <!-- leaving blanks at the beginning -->
-<script id="shader-vs" type="x-shader/x-vertex">
+<script id="shader-vs" type="x-shader/x-vertex">/// Alejandro Guayaquil 
+/// 09.2015 
+
 attribute vec3 aVertexPosition;
+attribute vec2 aVertexTexture;
+attribute vec3 aVertexNormal;
 attribute vec4 aVertexColor;
 
+uniform float uTime;
 uniform mat4 uMV;
 uniform mat4 uP;
 
+varying vec2 vTexture;
+varying vec3 vNormal;
 varying vec4 vColor;
 
 void main(void)
 {
+    vTexture = aVertexTexture;
+    vNormal = aVertexNormal;
     vColor = aVertexColor;
-    gl_Position = uP * uMV * vec4(aVertexPosition, 1.0);
-}
-</script>
 
-<script id="shader-fs" type="x-shader/x-fragment">
+    /// Rotation using trigonometry, not matrices
+    float x = aVertexPosition.x * cos(uTime);
+    float y = aVertexPosition.y;
+    float z = aVertexPosition.z * sin(uTime);
+
+    gl_Position = uP * uMV * vec4(vec3(x, y, z), 1.0);
+}</script>
+
+<script id="shader-fs" type="x-shader/x-fragment">/// Alejandro Guayaquil
+/// 09.2015
+
+/// Check what is the purpose of this line
 precision mediump float;
 
+varying vec2 vTexture;
+varying vec3 vNormal;
 varying vec4 vColor;
 
 void main(void)
 {
     gl_FragColor = vColor;
-}
-</script>
+}</script>
 
     <script type="text/javascript">
         /// Create context and dimensions
+        var shadersOK = false;
         var gl;
 
         function initGL(canvas)
@@ -73,77 +90,43 @@ void main(void)
         /// Create shaders
         var shaderProgram;
 
-        function initShaders(reload)
+        function loadShaders()
         {
             /// Compilation
             var vertexShaderContainer;
-
-            if (reload) {
-                vertexShaderContainer = document.getElementById("inputVS");
-                console.log(vertexShaderContainer.value);
-            }
-            else {
-                vertexShaderContainer = document.getElementById("shader-vs");
-            }
-
             var vertexShader;
+
+            /// Extract vertex shader container from the textarea of the HTML
+            vertexShaderContainer = document.getElementById("inputVS");
          
-            /// Extract raw text
-            var rawTextVertexShader = "";
-            var nodeVS = vertexShaderContainer.firstChild;
-            while (nodeVS)
-            {
-                /// nodeType 3???
-                if (nodeVS.nodeType == 3)
-                {
-                    rawTextVertexShader += nodeVS.textContent;
-                }
-                nodeVS = nodeVS.nextSibling;
-            }
-
-            if (reload) {
-                /// Debugging shaders
-                //console.log(rawTextVertexShader);
-            }
-
+            /// Here I am not sure if the member .value will be robust enough for a big project
             vertexShader = gl.createShader(gl.VERTEX_SHADER);
-            gl.shaderSource(vertexShader, rawTextVertexShader);
+            gl.shaderSource(vertexShader, vertexShaderContainer.value);
             gl.compileShader(vertexShader);
 
             if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS))
             {
                 alert(gl.getShaderInfoLog(vertexShader));
+                shadersOK = false;
+                return null;
             }
 
             var fragmentShaderContainer;
-
-            if (reload) {
-                fragmentShaderContainer = document.getElementById("inputFS");
-            }
-            else {
-                fragmentShaderContainer = document.getElementById("shader-fs");
-            }
-
             var fragmentShader;
 
-            /// Extract raw text
-            var rawTextFragmentShader = "";
-            var nodeFS = fragmentShaderContainer.firstChild;
-            while (nodeFS) {
-                /// nodeType 3???
-                if (nodeFS.nodeType == 3) {
-                    rawTextFragmentShader += nodeFS.textContent;
-                }
-                nodeFS = nodeFS.nextSibling;
-            }
+            /// Extract vertex shader container from the textarea of the HTML
+            fragmentShaderContainer = document.getElementById("inputFS");
 
+            /// Here I am not sure if the member .value will be robust enough for a big project
             fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-            gl.shaderSource(fragmentShader, rawTextFragmentShader);
+            gl.shaderSource(fragmentShader, fragmentShaderContainer.value);
             gl.compileShader(fragmentShader);
 
             if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS))
             {
                 alert(gl.getShaderInfoLog(fragmentShader));
+                shadersOK = false;
+                return null;
             }
 
             /// Linking
@@ -154,29 +137,43 @@ void main(void)
 
             if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS))
             {
-                alert("Linking error in shader");
+                alert(gl.getProgramInfoLog(shaderProgram));
+                shadersOK = false;
+                return null;
             }
 
+            /// Everything correct, start using shaders
             gl.useProgram(shaderProgram);
+            shadersOK = true;
 
             /// Enable attributes
             shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+            shaderProgram.vertexTextureAttribute = gl.getAttribLocation(shaderProgram, "aVertexTexture");
+            shaderProgram.vertexNormalAttribute = gl.getAttribLocation(shaderProgram, "aVertexNormal");
             shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexColor");
+
             gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+            gl.enableVertexAttribArray(shaderProgram.vertexTextureAttribute);
+            gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);
             gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
 
             /// Fetch matrix locations
             shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMV");
             shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uP");
+
+            /// Fetch variables locations
+            shaderProgram.timeUniform = gl.getUniformLocation(shaderProgram, "uTime");
         }
 
         /// Usage of separate buffers
         var vertexPositionBuffer;
+        var vertexTextureBuffer;
+        var vertexNormalBuffer;
         var vertexColorBuffer;
 
         function initBuffers()
         {
-            /// raw 3D geometric data
+            /// raw 3D geometric data - positions
             vertexPositionBuffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
 
@@ -193,6 +190,24 @@ void main(void)
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
             vertexColorBuffer.itemSize = 4;
             vertexColorBuffer.numItems = 3;
+
+            /// raw 3D geometric data - normals
+            vertexNormalBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, vertexNormalBuffer);
+
+            var normals = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0];
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
+            vertexNormalBuffer.itemSize = 3;
+            vertexNormalBuffer.numItems = 3;
+
+            /// raw 2D image data
+            vertexTextureBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, vertexTextureBuffer);
+
+            var textures = [-1.0, -1.0, +1.0, -1.0, 0.0, 1.0];
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures), gl.STATIC_DRAW);
+            vertexTextureBuffer.itemSize = 2;
+            vertexTextureBuffer.numItems = 3;
         }
 
         /// Math stuff
@@ -203,6 +218,20 @@ void main(void)
         {
             gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, projectionMatrix);
             gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, modelviewMatrix);
+        }
+
+        /// Animation
+        var timeClientSite = 0.0;
+
+        function setUniforms()
+        {
+            if (document.getElementById("checkBoxAnimation").checked)
+            {
+                /// I think I should add some condition to not exceed a huge number ... 
+                timeClientSite += 0.01;
+            }
+
+            gl.uniform1f(shaderProgram.timeUniform, timeClientSite);
         }
 
         /// Draw objects
@@ -217,36 +246,57 @@ void main(void)
             /// Create modelview matrix
             mat4.identity(modelviewMatrix);
             
-            /// Bind buffers
-            gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
-            gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+            if (shadersOK)
+            {
+                /// Bind buffers
+                gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+                gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer);
-            gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, vertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+                gl.bindBuffer(gl.ARRAY_BUFFER, vertexTextureBuffer);
+                gl.vertexAttribPointer(shaderProgram.vertexTextureAttribute, vertexTextureBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-            /// Set matrices in the GPU
-            setMatrixUniforms();
+                gl.bindBuffer(gl.ARRAY_BUFFER, vertexNormalBuffer);
+                gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, vertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-            /// Finally, RENDER!
-            gl.drawArrays(gl.TRIANGLES, 0, vertexPositionBuffer.numItems);
+                gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer);
+                gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, vertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+                /// Set matrices in the GPU
+                setMatrixUniforms();
+
+                /// Set time for animation
+                setUniforms();
+
+                /// Finally, RENDER!
+                gl.drawArrays(gl.TRIANGLES, 0, vertexPositionBuffer.numItems);
+            }
+        }
+
+        /// Animation / Update
+        function tick()
+        {
+            /// http://learningwebgl.com/blog/?p=3189
+            requestAnimationFrame(tick);
+            drawScene();
         }
 
         /// Initializer
         function WebGLInitializer(reload)
         {
             var canvas = document.getElementById("ExampleAlejandro");
-            canvas.height = window.innerHeight * 0.5;
-            canvas.width = window.innerWidth * 0.5;
+            canvas.height = window.innerHeight * 0.65;
+            canvas.width = window.innerWidth * 0.65;
 
             /// Prepare everything for the data required by WebGL
             initGL(canvas);
-            initShaders(reload);
             initBuffers();
+            loadShaders();
 
             /// Launch
             gl.clearColor(0.5, 0.5, 0.5, 1.0);
             gl.enable(gl.DEPTH_TEST);
-            drawScene();
+
+            tick();
         }
     </script>
 
@@ -255,8 +305,8 @@ void main(void)
         nav {
             line-height:30px;
             background-color:#eeeeee;
-            height:500px;
-            width:500px;
+            height:750px;
+            width:475px;
             float:left;
             padding:5px;	      
         }
@@ -275,11 +325,6 @@ void main(void)
             /// editing is still not available
             $("#inputVS").append($("#shader-vs").text());
             $("#inputFS").append($("#shader-fs").text());
-
-            /// Update the shaders
-            $("#inputVS").bind('input propertychange', function () {
-                WebGLInitializer(true);
-            });
         });
     </script>
 </head>
@@ -288,13 +333,14 @@ void main(void)
     <nav>
         <!-- Vertex shader input -->
         <section id="vsHTML">
-            <textarea type="text" cols="60" rows="15" id="inputVS"></textarea>
+            <textarea type="text" cols="60" rows="29" id="inputVS"></textarea>
         </section>
         <!-- Fragment shader input -->
         <section id="fsHTML">
-            <textarea type="text" cols="60" rows="10" id="inputFS"></textarea>
+            <textarea type="text" cols="60" rows="14" id="inputFS"></textarea>
         </section>
-        <button type="button" onclick="initShaders(true)">Compile</button>
+        Animation <input type="checkbox" id="checkBoxAnimation"/>
+        <button type="button" style="float: right;" onclick="loadShaders()">Compile</button>
     </nav>
     <section>
         <!--Our body, the beautiful stuff comes here-->
