@@ -10,6 +10,7 @@
 <html>
 <head>
     <title>WebGL Toy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!--I remembered to seen that JS code-->
     <!--is more efficient at the end of the body-->
@@ -19,6 +20,8 @@
 
     <!--jQuery-->
     <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+
+    <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
 
 <script id="shader-vs" type="x-shader/x-vertex">/// Alejandro Guayaquil 
 /// 09.2015 
@@ -71,6 +74,7 @@ void main(void)
 
     <script type="text/javascript">
         /// Create context and dimensions
+        var animation = false;
         var shadersOK = false;
         var gl;
 
@@ -195,7 +199,7 @@ void main(void)
             vertexColorBuffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer);
 
-            var colors = [1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0];
+            var colors = [1.0, 0.0, 0.0, 0.85, 0.0, 1.0, 0.0, 0.85, 0.0, 0.0, 1.0, 0.85];
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
             vertexColorBuffer.itemSize = 4;
             vertexColorBuffer.numItems = 3;
@@ -234,7 +238,7 @@ void main(void)
 
         function setUniforms()
         {
-            if (document.getElementById("checkBoxAnimation").checked)
+            if (animation)
             {
                 /// I think I should add some condition to not exceed a huge number ...
                 timeClientSite += 0.01;
@@ -289,12 +293,16 @@ void main(void)
             drawScene();
         }
 
+        /// Toggle Animation
+        function toggleAnimation()
+        {
+            animation = !animation;
+        }
+
         /// Initializer
         function WebGLInitializer(reload)
         {
             var canvas = document.getElementById("ExampleAlejandro");
-            canvas.height = window.innerHeight * 0.65;
-            canvas.width = window.innerWidth * 0.65;
 
             /// Prepare everything for the data required by WebGL
             initGL(canvas);
@@ -303,7 +311,9 @@ void main(void)
 
             /// Launch
             gl.clearColor(0.5, 0.5, 0.5, 1.0);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
             gl.enable(gl.DEPTH_TEST);
+            gl.enable(gl.BLEND);
 
             tick();
         }
@@ -324,7 +334,6 @@ void main(void)
                 lineNumbers: true,
                 matchBrackets: true,
             });
-            editorVS.setSize(450, 350);
 
             var textAreaFS = document.getElementById("inputFS");
             editorFS = CodeMirror.fromTextArea(textAreaFS, {
@@ -332,15 +341,14 @@ void main(void)
                 lineNumbers: true,
                 matchBrackets: true
             });
-            editorFS.setSize(450, 220);
-
+            
             var textAreaGS = document.getElementById("inputGS");
             editorGS = CodeMirror.fromTextArea(textAreaGS, {
                 mode: "text/x-csrc",
                 lineNumbers: true,
                 matchBrackets: true
             });
-            editorGS.setSize(450, 25);
+            editorGS.setSize($(this).width(), 25);
 
             var textAreaES = document.getElementById("inputES");
             editorES = CodeMirror.fromTextArea(textAreaES, {
@@ -348,7 +356,7 @@ void main(void)
                 lineNumbers: true,
                 matchBrackets: true
             });
-            editorES.setSize(450, 25);
+            editorES.setSize($(this).width(), 25);
 
             var textAreaCS = document.getElementById("inputCS");
             editorCS = CodeMirror.fromTextArea(textAreaCS, {
@@ -356,68 +364,47 @@ void main(void)
                 lineNumbers: true,
                 matchBrackets: true
             });
-            editorCS.setSize(450, 25);
+            editorCS.setSize($(this).width(), 25);
         });
     </script>
 
     <style>
-        /*I need to take a look for the options in the CSS world*/
-        nav {
-            line-height:15px;
-            background-color:#eeeeee;
-            height:850px;
-            width:475px;
-            float:left;
-            padding:5px;	      
-        }
-        section {
-            width:450px;
-            float:left;
-            padding:10px;
-        }
     </style>
 </head>
 <body onload="WebGLInitializer(false)">
     <!-- The layout of the web page -->
-    <nav>
-        <!-- Vertex shader input -->
-        <section id="vsHTML">
-            Vertex Shader
-            <textarea type="text" cols="60" id="inputVS"></textarea>
-        </section>
-        <!-- Fragment shader input -->
-        <section id="fsHTML">
-            Fragment Shader
-            <textarea type="text" cols="60" id="inputFS"></textarea>
-        </section>
-        <!-- Geometry shader input -->
-        <section id="gsHTML">
-            Geometry Shader
-            <textarea type="text" cols="60" id="inputGS"></textarea>
-        </section>
-        <!-- Tessellation control shader input -->
-        <section id="gsHTML">
-            Tessellation Control Shader
-            <textarea type="text" cols="60" id="inputCS"></textarea>
-        </section>
-        <!-- Tessellation evaluation shader input -->
-        <section id="gsHTML">
-            Tessellation Evaluation Shader
-            <textarea type="text" cols="60" id="inputES"></textarea>
-        </section>
-        Animation <input type="checkbox" id="checkBoxAnimation"/>
-        <button type="button" style="float: right;" onclick="loadShaders()">Compile</button>
-    </nav>
-    <section>
-        <!--Our body, the beautiful stuff comes here-->
-        <canvas id="ExampleAlejandro"></canvas>
-    </section>
+    <header class="w3-container w3-black w3-center">
+        <h5>Learning WebGL</h5>
+    </header>
+    <!--Our body, the beautiful stuff comes here-->
+    <div class="w3-container">
+        <div class="w3-half">
+            <div class="w3-container">
+                <!-- Vertex shader input -->
+                <div class="w3-container w3-indigo">
+                    <h4>Vertex Shader</h4>
+                </div>
+                <textarea type="text" cols="60" id="inputVS"></textarea> <br />
+                <!-- Fragment shader input -->
+                <div class="w3-container w3-indigo">
+                    <h4>Fragment Shader</h4>
+                </div>
+                <textarea type="text" cols="60" id="inputFS"></textarea> <br />
+                <a class="w3-btn w3-green" style="float: left;" onclick="toggleAnimation()">Animate</a>
+                <a class="w3-btn w3-blue" style="float: right;" onclick="loadShaders()">Compile</a>
+            </div>
+        </div>
+        <canvas id="ExampleAlejandro" class="w3-half w3-container"></canvas>
+    </div>
+    <footer class="w3-container w3-black w3-center">
+        <h5>&#169; Alejandro Guayaquil</h5>
+    </footer>
 
-    <!--Code syntax highlight-->
-    <!--http://codemirror.net/-->
+    <!--Code syntax highlight http://codemirror.net/-->
     <script src="codemirror/lib/codemirror.js"></script>
     <script src="codemirror/addon/edit/matchbrackets.js"></script>
     <link rel="stylesheet" href="codemirror/lib/codemirror.css">
     <script src="codemirror/mode/clike/clike.js"></script>
+
 </body>
 </html>
