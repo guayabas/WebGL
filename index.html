@@ -12,29 +12,34 @@
     <title>WebGL Toy</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!--I remembered to seen that JS code-->
-    <!--is more efficient at the end of the body-->
-
     <!--Fetch the math library-->
     <script type="text/javascript" src="gl-matrix-min.js"></script>
 
     <!--jQuery-->
     <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
-
     <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
 
 <script id="shader-vs" type="x-shader/x-vertex">/// Alejandro Guayaquil 
 /// 09.2015 
 
+/// Check what is the purpose of this line
+precision mediump float;
+
+/// Properties per vertex
 attribute vec3 aVertexPosition;
 attribute vec2 aVertexTexture;
 attribute vec3 aVertexNormal;
 attribute vec4 aVertexColor;
 
+/// Variable from the CPU
 uniform float uTime;
-uniform mat4 uMV;
+
+/// The model-view-projection
+uniform mat4 uM;
+uniform mat4 uV;
 uniform mat4 uP;
 
+/// Output variables for next stages
 varying vec2 vTexture;
 varying vec3 vNormal;
 varying vec4 vColor;
@@ -50,7 +55,7 @@ void main(void)
     float y = aVertexPosition.y;
     float z = aVertexPosition.z * sin(uTime);
 
-    gl_Position = uP * uMV * vec4(vec3(x, y, z), 1.0);
+    gl_Position = uP * uV * uM * vec4(vec3(x, y, z), 1.0);
 }</script>
 
 <script id="shader-fs" type="x-shader/x-fragment">/// Alejandro Guayaquil
@@ -59,6 +64,7 @@ void main(void)
 /// Check what is the purpose of this line
 precision mediump float;
 
+/// Input from previous stages
 varying vec2 vTexture;
 varying vec3 vNormal;
 varying vec4 vColor;
@@ -72,165 +78,25 @@ void main(void)
 <script id="shader-cs" type="x-shader/x-tessellationcontrol">/// Not active</script>
 <script id="shader-es" type="x-shader/x-tessellationevaluation">/// Not active</script>
 
+    <script type="text/javascript" src="src/buffers.js"></script>
+    <script type="text/javascript" src="src/shaders.js"></script>
+    <script type="text/javascript" src="src/resize.js"></script>
+    <script type="text/javascript" src="src/initgl.js"></script>
+    <script type="text/javascript" src="src/draw.js"></script>
+
     <script type="text/javascript">
-        /// Create context and dimensions
         var animation = false;
-        var shadersOK = false;
-        var gl;
-
-        function initGL(canvas)
-        {
-            /// Do not pay attention to the try-catch block
-            /// In programming is a "way" of coding safe stuff
-            try
-            {
-                /// Search about the Context argument
-                /// http://www.w3schools.com/tags/ref_canvas.asp
-                gl = canvas.getContext("experimental-webgl");
-
-                /// Dimensions of where to display
-                gl.viewportHeight = canvas.height;
-                gl.viewportWidth = canvas.width;
-            }
-            catch(e)
-            {
-                alert("Not initialization available for WebGL");
-            }
-        }
-
-        /// Create shaders
-        var shaderProgram;
-        var editorVS;
-        var editorFS;
-
-        function loadShaders()
-        {
-            /// Compilation
-            var vertexShaderContainer;
-            var vertexShader;
-
-            /// Extract vertex shader container from the textarea of the HTML
-            vertexShaderContainer = document.getElementById("inputVS");
-
-            /// Here I am not sure if the member .value will be robust enough for a big project
-            vertexShader = gl.createShader(gl.VERTEX_SHADER);
-            gl.shaderSource(vertexShader, editorVS.getValue());
-            gl.compileShader(vertexShader);
-
-            if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS))
-            {
-                alert(gl.getShaderInfoLog(vertexShader));
-                shadersOK = false;
-                return null;
-            }
-
-            var fragmentShaderContainer;
-            var fragmentShader;
-
-            /// Extract vertex shader container from the textarea of the HTML
-            fragmentShaderContainer = document.getElementById("inputFS");
-
-            /// Here I am not sure if the member .value will be robust enough for a big project
-            fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-            gl.shaderSource(fragmentShader, editorFS.getValue());
-            gl.compileShader(fragmentShader);
-
-            if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS))
-            {
-                alert(gl.getShaderInfoLog(fragmentShader));
-                shadersOK = false;
-                return null;
-            }
-
-            /// Linking
-            shaderProgram = gl.createProgram();
-            gl.attachShader(shaderProgram, fragmentShader);
-            gl.attachShader(shaderProgram, vertexShader);
-            gl.linkProgram(shaderProgram);
-
-            if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS))
-            {
-                alert(gl.getProgramInfoLog(shaderProgram));
-                shadersOK = false;
-                return null;
-            }
-
-            /// Everything correct, start using shaders
-            gl.useProgram(shaderProgram);
-            shadersOK = true;
-
-            /// Enable attributes
-            shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
-            shaderProgram.vertexTextureAttribute = gl.getAttribLocation(shaderProgram, "aVertexTexture");
-            shaderProgram.vertexNormalAttribute = gl.getAttribLocation(shaderProgram, "aVertexNormal");
-            shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexColor");
-
-            gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-            gl.enableVertexAttribArray(shaderProgram.vertexTextureAttribute);
-            gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);
-            gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
-
-            /// Fetch matrix locations
-            shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMV");
-            shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uP");
-
-            /// Fetch variables locations
-            shaderProgram.timeUniform = gl.getUniformLocation(shaderProgram, "uTime");
-        }
-
-        /// Usage of separate buffers
-        var vertexPositionBuffer;
-        var vertexTextureBuffer;
-        var vertexNormalBuffer;
-        var vertexColorBuffer;
-
-        function initBuffers()
-        {
-            /// raw 3D geometric data - positions
-            vertexPositionBuffer = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
-
-            var vertices = [-0.5, -0.5, 0.0, +0.5, -0.5, 0.0, 0.0, 0.5, 0.0];
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-            vertexPositionBuffer.itemSize = 3;
-            vertexPositionBuffer.numItems = 3;
-
-            /// raw RGBA color data
-            vertexColorBuffer = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer);
-
-            var colors = [1.0, 0.0, 0.0, 0.85, 0.0, 1.0, 0.0, 0.85, 0.0, 0.0, 1.0, 0.85];
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-            vertexColorBuffer.itemSize = 4;
-            vertexColorBuffer.numItems = 3;
-
-            /// raw 3D geometric data - normals
-            vertexNormalBuffer = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, vertexNormalBuffer);
-
-            var normals = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0];
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
-            vertexNormalBuffer.itemSize = 3;
-            vertexNormalBuffer.numItems = 3;
-
-            /// raw 2D image data
-            vertexTextureBuffer = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, vertexTextureBuffer);
-
-            var textures = [-1.0, -1.0, +1.0, -1.0, 0.0, 1.0];
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures), gl.STATIC_DRAW);
-            vertexTextureBuffer.itemSize = 2;
-            vertexTextureBuffer.numItems = 3;
-        }
-
+        
         /// Math stuff
         var projectionMatrix = mat4.create();
-        var modelviewMatrix = mat4.create();
+        var modelMatrix = mat4.create();
+        var viewMatrix = mat4.create();
 
         function setMatrixUniforms()
         {
             gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, projectionMatrix);
-            gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, modelviewMatrix);
+            gl.uniformMatrix4fv(shaderProgram.mMatrixUniform, false, modelMatrix);
+            gl.uniformMatrix4fv(shaderProgram.vMatrixUniform, false, viewMatrix);
         }
 
         /// Animation
@@ -247,45 +113,7 @@ void main(void)
             gl.uniform1f(shaderProgram.timeUniform, timeClientSite);
         }
 
-        /// Draw objects
-        function drawScene()
-        {
-            gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-            /// Create perspective projection
-            mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, projectionMatrix);
-
-            /// Create modelview matrix
-            mat4.identity(modelviewMatrix);
-
-            if (shadersOK)
-            {
-                /// Bind buffers
-                gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
-                gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-                gl.bindBuffer(gl.ARRAY_BUFFER, vertexTextureBuffer);
-                gl.vertexAttribPointer(shaderProgram.vertexTextureAttribute, vertexTextureBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-                gl.bindBuffer(gl.ARRAY_BUFFER, vertexNormalBuffer);
-                gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, vertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-                gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer);
-                gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, vertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-                /// Set matrices in the GPU
-                setMatrixUniforms();
-
-                /// Set time for animation
-                setUniforms();
-
-                /// Finally, RENDER!
-                gl.drawArrays(gl.TRIANGLES, 0, vertexPositionBuffer.numItems);
-            }
-        }
-
-        /// Animation / Update
+        /// Update
         function tick()
         {
             /// http://learningwebgl.com/blog/?p=3189
@@ -300,12 +128,10 @@ void main(void)
         }
 
         /// Initializer
-        function WebGLInitializer(reload)
+        function WebGLInitializer()
         {
-            var canvas = document.getElementById("ExampleAlejandro");
-
             /// Prepare everything for the data required by WebGL
-            initGL(canvas);
+            initGL();
             initBuffers();
             loadShaders();
 
@@ -371,13 +197,20 @@ void main(void)
     <style>
     </style>
 </head>
-<body onload="WebGLInitializer(false)">
+<body onload="WebGLInitializer()">
     <!-- The layout of the web page -->
     <header class="w3-container w3-black w3-center">
         <h5>Learning WebGL</h5>
     </header>
     <!--Our body, the beautiful stuff comes here-->
     <div class="w3-container">
+        <div class="w3-half">
+            <div class="we3-container" id="WebGLContainer">
+                <canvas id="WebGLCanvas"></canvas>
+            </div>
+            <a class="w3-btn w3-green" style="float: left;" onclick="toggleAnimation()">Animate</a>
+            <a class="w3-btn w3-blue" style="float: right;" onclick="loadShaders()">Compile</a>
+        </div>
         <div class="w3-half">
             <div class="w3-container">
                 <!-- Vertex shader input -->
@@ -390,11 +223,8 @@ void main(void)
                     <h4>Fragment Shader</h4>
                 </div>
                 <textarea type="text" cols="60" id="inputFS"></textarea> <br />
-                <a class="w3-btn w3-green" style="float: left;" onclick="toggleAnimation()">Animate</a>
-                <a class="w3-btn w3-blue" style="float: right;" onclick="loadShaders()">Compile</a>
             </div>
         </div>
-        <canvas id="ExampleAlejandro" class="w3-half w3-container"></canvas>
     </div>
     <footer class="w3-container w3-black w3-center">
         <h5>&#169; Alejandro Guayaquil</h5>
