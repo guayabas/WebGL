@@ -228,20 +228,16 @@ void main(void)
     <!--Our body, the beautiful stuff comes here-->
     <div class="w3-row-padding">
         <div class="w3-half">
-            <div class="w3-group">
-                <input class="w3-container" id="inputURLImage" style="width:100%; height:35px;" type="text" value="images/GoogleAndroid.jpg" required>
-                <!--<label class="w3-label" style="padding:0px 0px 0px 5px;">URL Image</label>-->
-            </div>
+            <input class="w3-container" id="inputURLImage" style="width:100%; height:35px;" type="text" value="images/GoogleAndroid.jpg" required>
+            <!--<label class="w3-label" style="padding:0px 0px 0px 5px;">URL Image</label>-->
         </div>
         <div class="w3-half">
-            <div class="w3-group">
-                <a class="w3-btn w3-green" style="width:100%;" onclick="reloadTextureImage()">Load Image</a>
-            </div>
+            <a class="w3-btn w3-green" style="width:100%;" onclick="reloadTextureImage()">Load Image</a>
         </div>
     </div>
     
     <div class="w3-container">
-        <canvas id="WebGLCanvas" style="width:50%; margin-left:auto; margin-right:auto; display:block"></canvas> 
+        <canvas id="WebGLCanvas" style="width:60%; margin-left:auto; margin-right:auto; display:block"></canvas> 
     </div>
     <div class="w3-container">
         <a class="w3-btn w3-green" style="float: left;" onclick="toggleAnimation()">Animate</a>
