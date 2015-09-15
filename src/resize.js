@@ -13,8 +13,8 @@ function resize(gl)
 	// Lookup the size the browser is displaying the canvas in CSS pixels
 	// and compute a size needed to make our drawingbuffer match it in
 	// device pixels.
-	var displayHeight = Math.floor(document.getElementById("WebGLContainer").clientHeight * 3 * realToCSSPixels);
-	var displayWidth  = Math.floor(document.getElementById("WebGLContainer").clientWidth  * realToCSSPixels);
+	var displayHeight = Math.floor(gl.canvas.clientHeight * realToCSSPixels);
+	var displayWidth  = Math.floor(gl.canvas.clientWidth  * realToCSSPixels);
 
 	// Check if the canvas is not the same size.
 	if (gl.canvas.width  != displayWidth ||

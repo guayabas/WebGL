@@ -33,6 +33,12 @@ function drawScene()
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer);
 		gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, vertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer);
+		
+		/// Bind texture
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, textureID);
+		
 		/// Set matrices in the GPU
 		setMatrixUniforms();
 
@@ -40,6 +46,9 @@ function drawScene()
 		setUniforms();
 
 		/// Finally, RENDER!
-		gl.drawArrays(gl.TRIANGLES, 0, vertexPositionBuffer.numItems);
+		/// Remember that if we are not using index buffer we could use glDrawArray(...)
+		/// but check the documentation since we need to repeat data https://www.opengl.org/sdk/docs/man3/xhtml/glDrawArrays.xml
+		/// gl.drawArrays(gl.TRIANGLES, 0, vertexPositionBuffer.numItems);
+		gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
 	}
 }
