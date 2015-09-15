@@ -133,14 +133,29 @@ void main(void)
             animation = !animation;
         }
 
+        /// Reload texture
+        function reloadTextureImage()
+        {
+            /// For loading of another computer I will have to read about this
+            /// https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
+            var urlText = document.getElementById("inputURLImage").value;
+            initTextures(urlText);
+        }
+
         /// Initializer
         function WebGLInitializer()
         {
-            /// Prepare everything for the data required by WebGL
+            /// Create context
             initGL();
+
+            /// Create buffers for the geometry
             initBuffers();
+
+            /// Load the beautiful shaders
             loadShaders();
-            initTextures();
+
+            /// Load the image
+            initTextures("images/FlagMexico.png");
 
             /// Launch
             gl.clearColor(0.5, 0.5, 0.5, 1.0);
@@ -209,24 +224,44 @@ void main(void)
     <header class="w3-container w3-black w3-center">
         <h5>Learning WebGL</h5>
     </header>
+
     <!--Our body, the beautiful stuff comes here-->
-    <div class="w3-container">
-        <canvas id="WebGLCanvas" class="w3-half w3-container"></canvas>
+    <div class="w3-row-padding">
         <div class="w3-half">
-            <div class="w3-container">
-                <!-- Vertex shader input -->
-                <div class="w3-container w3-indigo">
-                    <h4>Vertex Shader</h4>
-                </div>
-                <textarea type="text" cols="60" id="inputVS"></textarea> <br />
-                <!-- Fragment shader input -->
-                <div class="w3-container w3-indigo">
-                    <h4>Fragment Shader</h4>
-                </div>
-                <textarea type="text" cols="60" id="inputFS"></textarea> <br />
+            <div class="w3-group">
+                <input class="w3-container" id="inputURLImage" style="width:100%; height:35px;" type="text" value="images/GoogleAndroid.jpg" required>
+                <!--<label class="w3-label" style="padding:0px 0px 0px 5px;">URL Image</label>-->
             </div>
-            <a class="w3-btn w3-green" style="float: left;" onclick="toggleAnimation()">Animate</a>
-            <a class="w3-btn w3-blue" style="float: right;" onclick="loadShaders()">Compile</a>
+        </div>
+        <div class="w3-half">
+            <div class="w3-group">
+                <a class="w3-btn w3-green" style="width:100%;" onclick="reloadTextureImage()">Load Image</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="w3-container">
+        <canvas id="WebGLCanvas" style="width:50%; margin-left:auto; margin-right:auto; display:block"></canvas> 
+    </div>
+    <div class="w3-container">
+        <a class="w3-btn w3-green" style="float: left;" onclick="toggleAnimation()">Animate</a>
+        <a class="w3-btn w3-blue" style="float: right;" onclick="loadShaders()">Compile</a>
+    </div>
+    
+    <div class="w3-row-padding">
+        <div class="w3-half">
+            <!-- Vertex shader input -->
+            <div class="w3-container w3-indigo">
+                <h4>Vertex Shader</h4>
+            </div>
+            <textarea type="text" cols="60" id="inputVS"></textarea> <br />
+        </div>
+        <div class="w3-half">
+            <!-- Fragment shader input -->
+            <div class="w3-container w3-indigo">
+                <h4>Fragment Shader</h4>
+            </div>
+            <textarea type="text" cols="60" id="inputFS"></textarea> <br />
         </div>
     </div>
     <footer class="w3-container w3-black w3-center">

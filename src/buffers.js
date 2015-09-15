@@ -17,11 +17,12 @@ function initBuffers()
 	vertexPositionBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
 
+	var halflen = 1.0;
 	var vertices = [
-	-0.5, -0.5, 0.0, 
-	+0.5, -0.5, 0.0, 
-	+0.5, +0.5, 0.0,
-	-0.5, +0.5, 0.0
+	-halflen, -halflen, 0.0, 
+	-halflen, +halflen, 0.0, 
+	+halflen, +halflen, 0.0,
+	+halflen, -halflen, 0.0
 	];
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 	vertexPositionBuffer.itemSize = 3;
@@ -60,10 +61,10 @@ function initBuffers()
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertexTextureBuffer);
 
 	var textures = [
-	-1.0, -1.0, 
-	+1.0, -1.0, 
-	+1.0, +1.0,
-	-1.0, -1.0
+	0.0, 0.0, 
+	0.0, 1.0, 
+	1.0, 1.0,
+	1.0, 0.0
 	];
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures), gl.STATIC_DRAW);
 	vertexTextureBuffer.itemSize = 2;

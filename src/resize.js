@@ -17,14 +17,13 @@ function resize(gl)
 	var displayWidth  = Math.floor(gl.canvas.clientWidth  * realToCSSPixels);
 
 	// Check if the canvas is not the same size.
-	if (gl.canvas.width  != displayWidth ||
-	  gl.canvas.height != displayHeight) {
+	if (gl.canvas.width != displayWidth || gl.canvas.height != displayHeight) 
+	{
+		// Make the canvas the same size
+		gl.canvas.width  = displayWidth;
+		gl.canvas.height = displayHeight;
 
-	// Make the canvas the same size
-	gl.canvas.width  = displayWidth;
-	gl.canvas.height = displayHeight;
-
-	// Set the viewport to match
-	gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+		// Set the viewport to match
+		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 	}
 }
