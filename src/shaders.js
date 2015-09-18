@@ -79,4 +79,5 @@ function loadShaders()
 
 	/// Fetch variables locations
 	shaderProgram.timeUniform = gl.getUniformLocation(shaderProgram, "uTime");
+	shaderProgram.toggleTexture = gl.getUniformLocation(shaderProgram, "uToggleTexture");
 }

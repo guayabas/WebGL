@@ -4,16 +4,39 @@
  * @version 1.0.0
  */
  
+/// To radians
+function degreeToRadians(degrees)
+{
+	return (degrees * (Math.PI / 180.0));
+	
+}
+ 
+/// Translate camera
+function translateCamera()
+{
+	mat4.translate(viewMatrix, [0.0, 0.0, -5.0]);
+}
+ 
+/// Rotate camera
+function rotateCamera()
+{
+	mat4.rotate(viewMatrix, degreeToRadians(timeClientSite), [0.0, 1.0, 0.0]);
+	mat4.rotate(viewMatrix, degreeToRadians(-45.0), [0.0, 1.0, 0.0]);
+	mat4.rotate(viewMatrix, degreeToRadians(+45.0), [1.0, 0.0, 0.0]);
+}
+ 
 /// Draw objects
 function drawScene()
 {
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 	/// Create perspective projection
-	mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, projectionMatrix);
+	mat4.perspective(30, gl.canvas.width / gl.canvas.height, 0.1, 100.0, projectionMatrix);
 
 	/// Create view matrix
 	mat4.identity(viewMatrix);
+	translateCamera();
+	rotateCamera();	
 	
 	/// Create model matrix
 	mat4.identity(modelMatrix);
@@ -49,6 +72,6 @@ function drawScene()
 		/// Remember that if we are not using index buffer we could use glDrawArray(...)
 		/// but check the documentation since we need to repeat data https://www.opengl.org/sdk/docs/man3/xhtml/glDrawArrays.xml
 		/// gl.drawArrays(gl.TRIANGLES, 0, vertexPositionBuffer.numItems);
-		gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+		gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 	}
 }

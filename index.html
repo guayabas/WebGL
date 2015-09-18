@@ -13,7 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!--Fetch the math library-->
-    <script type="text/javascript" src="gl-matrix-min.js"></script>
+    <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
 
     <!--jQuery-->
     <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
@@ -50,12 +50,7 @@ void main(void)
     vNormal = aVertexNormal;
     vColor = aVertexColor;
 
-    /// Rotation using trigonometry, not matrices
-    float x = aVertexPosition.x * cos(uTime);
-    float y = aVertexPosition.y;
-    float z = aVertexPosition.z * sin(uTime);
-
-    gl_Position = uP * uV * uM * vec4(vec3(x, y, z), 1.0);
+    gl_Position = uP * uV * uM * vec4(aVertexPosition, 1.0);
 }</script>
 
 <script id="shader-fs" type="x-shader/x-fragment">/// Alejandro Guayaquil
@@ -69,13 +64,24 @@ varying vec2 vTexture;
 varying vec3 vNormal;
 varying vec4 vColor;
 
+/// Toggle texture
+uniform int uToggleTexture;
+
 /// ID for the texture
 uniform sampler2D uSamplerTexture;
 
 void main(void)
 {
-    /// Fecth the coordinates from the image and apply to the pixel
-    gl_FragColor = texture2D(uSamplerTexture, vTexture);
+    if (uToggleTexture > 0)
+    {
+        /// Fecth the coordinates from the image and apply to the pixel
+        gl_FragColor = texture2D(uSamplerTexture, vTexture);
+    }
+    else
+    {
+        /// Cube has color per face (:
+        gl_FragColor = vColor;
+    }
 }</script>
 
 <script id="shader-gs" type="x-shader/x-geometry">/// Not active</script>
@@ -91,6 +97,7 @@ void main(void)
 
     <script type="text/javascript">
         var animation = false;
+        var toggletex = false;
         
         /// Math stuff
         var projectionMatrix = mat4.create();
@@ -105,18 +112,24 @@ void main(void)
         }
 
         /// Animation
-        var timeClientSite = 0.0;
+        var timeClientSite = 0;
 
         function setUniforms()
         {
             if (animation)
             {
                 /// I think I should add some condition to not exceed a huge number ...
-                timeClientSite += 0.01;
+                timeClientSite += 1;
+
+                if (timeClientSite > 360)
+                {
+                    timeClientSite = 0;
+                }
             }
 
             gl.uniform1f(shaderProgram.timeUniform, timeClientSite);
             gl.uniform1i(shaderProgram.samplerUniform, 0);
+            
         }
 
         /// Update
@@ -131,6 +144,13 @@ void main(void)
         function toggleAnimation()
         {
             animation = !animation;
+        }
+
+        /// Toggle texture
+        function toggleTexture()
+        {
+            toggletex = !toggletex;
+            gl.uniform1i(shaderProgram.toggleTexture, toggletex);
         }
 
         /// Reload texture
@@ -155,7 +175,7 @@ void main(void)
             loadShaders();
 
             /// Load the image
-            initTextures("images/FlagMexico.png");
+            initTextures("images/Brick.jpg");
 
             /// Launch
             gl.clearColor(0.5, 0.5, 0.5, 1.0);
@@ -239,9 +259,14 @@ void main(void)
     <div class="w3-container">
         <canvas id="WebGLCanvas" style="width:60%; margin-left:auto; margin-right:auto; display:block"></canvas> 
     </div>
-    <div class="w3-container">
-        <a class="w3-btn w3-green" style="float: left;" onclick="toggleAnimation()">Animate</a>
-        <a class="w3-btn w3-blue" style="float: right;" onclick="loadShaders()">Compile</a>
+    <div class="w3-row-padding">
+        <div class="w3-half">
+            <a class="w3-btn w3-green" style="float: left;" onclick="toggleAnimation()">Animate</a>
+            <a class="w3-btn w3-red" style="float: left;" onclick="toggleTexture()">Toggle Texture</a>
+        </div>
+        <div class="w3-half">
+            <a class="w3-btn w3-blue" style="float: right;" onclick="loadShaders()">Compile</a>
+        </div>
     </div>
     
     <div class="w3-row-padding">
