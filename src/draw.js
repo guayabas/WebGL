@@ -21,13 +21,14 @@ function translateCamera()
 function rotateCamera()
 {
 	mat4.rotate(viewMatrix, degreeToRadians(timeClientSite), [0.0, 1.0, 0.0]);
-	mat4.rotate(viewMatrix, degreeToRadians(-45.0), [0.0, 1.0, 0.0]);
-	mat4.rotate(viewMatrix, degreeToRadians(+45.0), [1.0, 0.0, 0.0]);
+	mat4.rotate(viewMatrix, degreeToRadians(+45.0), [0.0, 1.0, 0.0]);
+	mat4.rotate(viewMatrix, degreeToRadians(-45.0), [1.0, 0.0, 0.0]);
 }
  
 /// Draw objects
 function drawScene()
 {
+	resize(gl);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 	/// Create perspective projection
@@ -41,6 +42,12 @@ function drawScene()
 	/// Create model matrix
 	mat4.identity(modelMatrix);
 
+	/// Compute normal matrix
+	mat4.identity(mvMatrix);
+	mat4.multiply(viewMatrix, modelMatrix, mvMatrix);
+	mat4.toInverseMat3(mvMatrix, normalMatrix);
+	mat3.transpose(normalMatrix);
+	
 	if (shadersOK)
 	{
 		/// Bind buffers

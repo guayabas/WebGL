@@ -76,8 +76,15 @@ function loadShaders()
 	shaderProgram.mMatrixUniform = gl.getUniformLocation(shaderProgram, "uM");
 	shaderProgram.vMatrixUniform = gl.getUniformLocation(shaderProgram, "uV");
 	shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uP");
-
+	shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, "uN");
+	
+	/// Fetch lighting locations
+	shaderProgram.aLightUniform = gl.getUniformLocation(shaderProgram, "uLightAmbient");
+	shaderProgram.dLightUniform = gl.getUniformLocation(shaderProgram, "uLightDiffuse");
+	shaderProgram.sLightUniform = gl.getUniformLocation(shaderProgram, "uLightSpecular");
+	shaderProgram.pLightUniform = gl.getUniformLocation(shaderProgram, "uLightPosition");
+	
 	/// Fetch variables locations
-	shaderProgram.timeUniform = gl.getUniformLocation(shaderProgram, "uTime");
 	shaderProgram.toggleTexture = gl.getUniformLocation(shaderProgram, "uToggleTexture");
+	shaderProgram.timeUniform = gl.getUniformLocation(shaderProgram, "uTime");
 }

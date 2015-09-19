@@ -131,7 +131,7 @@ function initBuffers()
 	0.0, -1.0, 0.0,
 	0.0, -1.0, 0.0,
 	0.0, -1.0, 0.0,
-	0.0, -1.0, 0.0,
+	0.0, -1.0, 0.0
 	];
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
 	vertexNormalBuffer.itemSize = 3;
@@ -176,8 +176,7 @@ function initBuffers()
 	vertexTextureBuffer.itemSize = 2;
 	vertexTextureBuffer.numItems = 24;
 	
-	
-	/// 32bit Indices 
+	/// 16bit Indices 
 	indicesBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer);
 	
