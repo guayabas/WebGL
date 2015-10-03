@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
 
 <script id="shader-vs" type="x-shader/x-vertex">/// Alejandro Guayaquil 
-/// 09.2015 
+/// 10.2015 
 
 /// Check what is the purpose of this line
 precision mediump float;
@@ -29,7 +29,6 @@ precision mediump float;
 attribute vec3 aVertexPosition;
 attribute vec2 aVertexTexture;
 attribute vec3 aVertexNormal;
-attribute vec4 aVertexColor;
 
 /// Variable from the CPU
 uniform float uTime;
@@ -43,18 +42,15 @@ uniform mat4 uP;
 varying vec2 vTexture;
 varying vec3 vNormal;
 varying vec4 vVertex;
-varying vec4 vColor;
 
 void main(void)
 {
     vTexture = aVertexTexture;
     vNormal = aVertexNormal;
-    vColor = aVertexColor;
 
     vVertex = (uV * uM) * vec4(aVertexPosition, 1.0);
     gl_Position = uP * vVertex;
 }</script>
-
 <script id="shader-fs" type="x-shader/x-fragment">/// Alejandro Guayaquil
 /// 09.2015
 
@@ -86,7 +82,7 @@ void main(void)
     }
 }</script>
 <script id="shader-fs-phong-shading" type="x-shader/x-fragment">/// Alejandro Guayaquil
-/// 09.2015
+/// 10.2015
 
 /// Check what is the purpose of this line
 precision mediump float;
@@ -95,7 +91,6 @@ precision mediump float;
 varying vec2 vTexture;
 varying vec4 vVertex;
 varying vec3 vNormal;
-varying vec4 vColor;
 
 /// Lighting requires the view and normal matrix, just once not per vertex or fragment
 uniform mat4 uV;
@@ -123,8 +118,7 @@ void main(void)
     }
     else
     {
-        /// Cube has color per face (:
-        material = vColor.xyz;
+        material = vec3(1, 1, 1);
     }
 
     /// Maybe is too expensive to do the norm in the shader ... 
@@ -164,8 +158,13 @@ void main(void)
 <script id="shader-cs" type="x-shader/x-tessellationcontrol">/// Not active</script>
 <script id="shader-es" type="x-shader/x-tessellationevaluation">/// Not active</script>
 
+    <!-- Procedural objects ... maybe set from there ...  -->
+    <!--<script type="text/javascript" src="src/cube.js"></script>-->
+
+    <!-- External models ... more robust please -->
+    <script type="text/javascript" src="src/meshloader.js"></script>
+
     <script type="text/javascript" src="src/textures.js"></script>
-    <script type="text/javascript" src="src/buffers.js"></script>
     <script type="text/javascript" src="src/shaders.js"></script>
     <script type="text/javascript" src="src/resize.js"></script>
     <script type="text/javascript" src="src/initgl.js"></script>
@@ -210,7 +209,7 @@ void main(void)
             gl.uniform1i(shaderProgram.samplerUniform, 0);
 
             /// Lighting
-            var position = [1.0, 1.0, 1.0, 1.0];
+            var position = [0.0, 100.0, 0.0, 1.0];
             var specular = [1.0, 1.0, 1.0];
             var diffuse = [0.5, 0.5, 0.5];
             var ambient = [0.1, 0.1, 0.1];
@@ -257,17 +256,20 @@ void main(void)
             /// Create context
             initGL();
 
-            /// Create buffers for the geometry
-            initBuffers();
-
             /// Load the beautiful shaders
             loadShaders();
 
             /// Load the image
             initTextures("images/Brick.jpg");
 
+            /// Load the model
+            loadMesh("Teapot.json");
+
+            /// Load procedural objects
+            //loadCubeColorPerFace();
+
             /// Launch
-            gl.clearColor(0.5, 0.5, 0.5, 1.0);
+            gl.clearColor(1.0, 1.0, 1.0, 1.0);
             gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
             gl.enable(gl.DEPTH_TEST);
             gl.enable(gl.BLEND);
@@ -276,8 +278,6 @@ void main(void)
         }
 
         $(document).ready(function () {
-            /// Works but the formatting is not nice, plus
-            /// editing is still not available
             $("#inputVS").append($("#shader-vs").text());
             $("#inputFS").append($("#shader-fs-phong-shading").text());
             $("#inputGS").append($("#shader-gs").text());
@@ -338,7 +338,6 @@ void main(void)
     <div class="w3-row-padding">
         <div class="w3-half">
             <input class="w3-container" id="inputURLImage" style="width:100%; height:35px;" type="text" value="images/GoogleAndroid.jpg" required>
-            <!--<label class="w3-label" style="padding:0px 0px 0px 5px;">URL Image</label>-->
         </div>
         <div class="w3-half">
             <a class="w3-btn w3-green" style="width:100%;" onclick="reloadTextureImage()">Load Image</a>
@@ -346,7 +345,7 @@ void main(void)
     </div>
     
     <div class="w3-container">
-        <canvas id="WebGLCanvas" style="width:60%; margin-left:auto; margin-right:auto; display:block"></canvas> 
+        <canvas id="WebGLCanvas" style="width:100%; margin-left:auto; margin-right:auto; display:block"></canvas> 
     </div>
     <div class="w3-row-padding">
         <a class="w3-btn w3-green" style="float: left;" onclick="toggleAnimation()">Animate</a>

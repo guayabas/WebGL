@@ -5,17 +5,27 @@
  */
  
 /// Usage of separate buffers
-var vertexPositionBuffer;
-var vertexTextureBuffer;
-var vertexNormalBuffer;
-var vertexColorBuffer;
-var indicesBuffer;
+var buffers = {
+    /// Flags
+    positionEnabled: true,
+    indicesEnabled: true,
+    textureEnabled: true,
+    normalEnabled: true,
+    colorEnabled: false,
 
-function initBuffers()
+    /// Handle for buffers
+    vertexPosition: -1,
+    vertexTexture: -1,
+    vertexNormal: -1,
+    vertexColor: -1,
+    indices: -1
+};
+
+function loadCubeColorPerFace()
 {
 	/// raw 3D geometric data - positions
-	vertexPositionBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+    buffers.vertexPosition = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertexPosition);
 
 	var halflen = 0.5;
 	var vertices = [
@@ -56,12 +66,12 @@ function initBuffers()
 	+halflen, -halflen, -halflen  // v3
 	];
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-	vertexPositionBuffer.itemSize = 3;
-	vertexPositionBuffer.numItems = 24;
+	buffers.vertexPosition.itemSize = 3;
+	buffers.vertexPosition.numItems = 24;
 
 	/// raw RGBA color data
-	vertexColorBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer);
+	buffers.vertexColor = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertexColor);
 
 	var colors = [
 	1.0, 0.0, 0.0, 1.0, // red
@@ -95,12 +105,12 @@ function initBuffers()
 	1.0, 0.0, 1.0, 1.0
 	];
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-	vertexColorBuffer.itemSize = 4;
-	vertexColorBuffer.numItems = 24;
+	buffers.vertexColor.itemSize = 4;
+	buffers.vertexColor.numItems = 24;
 
 	/// raw 3D geometric data - normals
-	vertexNormalBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, vertexNormalBuffer);
+	buffers.vertexNormal = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertexNormal);
 
 	var normals = [
 	0.0, 0.0, +1.0, 
@@ -134,12 +144,12 @@ function initBuffers()
 	0.0, -1.0, 0.0
 	];
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
-	vertexNormalBuffer.itemSize = 3;
-	vertexNormalBuffer.numItems = 24;
+	buffers.vertexNormal.itemSize = 3;
+	buffers.vertexNormal.numItems = 24;
 
 	/// raw 2D image data
-	vertexTextureBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, vertexTextureBuffer);
+	buffers.vertexTexture = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertexTexture);
 
 	var textures = [
 	0.0, 0.0, 
@@ -173,12 +183,12 @@ function initBuffers()
 	0.0, 1.0
 	];
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures), gl.STATIC_DRAW);
-	vertexTextureBuffer.itemSize = 2;
-	vertexTextureBuffer.numItems = 24;
+	buffers.vertexTexture.itemSize = 2;
+	buffers.vertexTexture.numItems = 24;
 	
 	/// 16bit Indices 
-	indicesBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer);
+	buffers.indices = gl.createBuffer();
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
 	
 	var indices = [
 		0, 1, 2, 0, 2, 3, /// front face
@@ -189,6 +199,6 @@ function initBuffers()
 		20, 21, 22, 20, 22, 23  /// bottom face
 	];
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
-	indicesBuffer.numItems = 36;
-	
+	buffers.indices.itemSize = 1;
+	buffers.indices.numItems = 36;
 }
