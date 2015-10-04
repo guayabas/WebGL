@@ -159,10 +159,10 @@ void main(void)
 <script id="shader-es" type="x-shader/x-tessellationevaluation">/// Not active</script>
 
     <!-- Procedural objects ... maybe set from there ...  -->
-    <!--<script type="text/javascript" src="src/cube.js"></script>-->
+    <script type="text/javascript" src="src/box.js"></script>
 
     <!-- External models ... more robust please -->
-    <script type="text/javascript" src="src/meshloader.js"></script>
+    <!--<script type="text/javascript" src="src/meshloader.js"></script>-->
 
     <script type="text/javascript" src="src/textures.js"></script>
     <script type="text/javascript" src="src/shaders.js"></script>
@@ -170,10 +170,11 @@ void main(void)
     <script type="text/javascript" src="src/initgl.js"></script>
     <script type="text/javascript" src="src/draw.js"></script>
 
+    <script src="src/globals.js" type="text/javascript"></script>
     <script type="text/javascript">
         var animation = false;
         var toggletex = false;
-        
+
         /// Math stuff
         var projectionMatrix = mat4.create();
         var normalMatrix = mat3.create();
@@ -263,10 +264,10 @@ void main(void)
             initTextures("images/Brick.jpg");
 
             /// Load the model
-            loadMesh("Teapot.json");
+            //loadMesh("Teapot.json");
 
             /// Load procedural objects
-            //loadCubeColorPerFace();
+            loadCubeColorPerFace();
 
             /// Launch
             gl.clearColor(1.0, 1.0, 1.0, 1.0);
@@ -322,11 +323,42 @@ void main(void)
                 matchBrackets: true
             });
             editorCS.setSize($(this).width(), 25);
+
+            /// Save render as image
+            /// http://weworkweplay.com/play/saving-html5-canvas-as-image/
+            var button = document.getElementById("buttonSaveRender");
+            button.addEventListener('click', function (e) {
+                var canvas = document.getElementById("WebGLCanvas");
+                var img = canvas.toDataURL("image/png");
+                button.href = img;
+            });
         });
     </script>
 
-    <style>
-    </style>
+    <script type="text/javascript">
+        function openWindowPredefinedModels()
+        {
+            var windowH = window.innerHeight;
+            var windowW = window.innerWidth;
+
+            var offsetH = windowH * 0.125;
+            var childwH = windowH * 0.750;
+            
+            var offsetW = windowW * 0.125;
+            var childwW = windowW * 0.750;
+            
+            var specificationsChildWindow = "";
+
+            specificationsChildWindow += "resizable=0, ";
+            specificationsChildWindow += "height=" + childwH.toString() + ", ";
+            specificationsChildWindow += "width=" + childwW.toString() + ", ";
+            specificationsChildWindow += "left=" + offsetW.toString() + ", ";
+            specificationsChildWindow += "top=" + offsetH.toString() + ", ";
+
+            var URL = "assets/predefinedModels.html";
+            window.open(URL, "", specificationsChildWindow);
+        }
+    </script>
 </head>
 <body onload="WebGLInitializer()">
     <!-- The layout of the web page -->
@@ -350,7 +382,9 @@ void main(void)
     <div class="w3-row-padding">
         <a class="w3-btn w3-green" style="float: left;" onclick="toggleAnimation()">Animate</a>
         <a class="w3-btn w3-red" style="float: left;" onclick="toggleTexture()">Toggle Texture</a>
+        <a class="w3-btn w3-teal" style="float: left;" id="buttonSaveRender" download="render.png">Save Render</a>
         <a class="w3-btn w3-blue" style="float: right;" onclick="loadShaders()">Compile</a>
+        <a class="w3-btn w3-indigo" style="float:right;" onclick="openWindowPredefinedModels()">Choose Predefined 3D Model</a>
     </div>
     
     <div class="w3-row-padding">

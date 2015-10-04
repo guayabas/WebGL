@@ -8,13 +8,12 @@
 function degreeToRadians(degrees)
 {
 	return (degrees * (Math.PI / 180.0));
-	
 }
  
 /// Translate camera
 function translateCamera()
 {
-	mat4.translate(viewMatrix, [0.0, 0.0, -80.0]);
+	mat4.translate(viewMatrix, [0.0, 0.0, -5.0]);
 }
  
 /// Rotate camera
@@ -50,6 +49,9 @@ function drawScene()
 	
 	if (shadersOK)
 	{
+	    /// Choose the model to render
+	    //console.log(modelID);
+
 	    /// Bind buffers
 	    if (buffers.positionEnabled)
 	    {
