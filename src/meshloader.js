@@ -20,24 +20,6 @@ function loadMesh(modelName)
 
     request.send();
 }
- 
-///// Usage of separate buffers
-//var buffers =
-//{
-//    /// Flags
-//    positionEnabled: true,
-//    indicesEnabled: true,
-//    textureEnabled: true,
-//    normalEnabled: true,
-//    colorEnabled: false,
-
-//    /// Handle for buffers
-//    vertexPosition: -1,
-//    vertexTexture: -1,
-//    vertexNormal: -1,
-//    vertexColor: -1,
-//    indices: -1
-//};
 
 var mesh = { buffers: {} };
 

@@ -1,25 +1,8 @@
 /**
- * @fileoverview Initialize buffers
+ * @fileoverview Procedural box
  * @author Alejandro Guayaquil
  * @version 1.0.0
  */
- 
-/// Usage of separate buffers
-//var buffers = {
-//    /// Flags
-//    positionEnabled: true,
-//    indicesEnabled: true,
-//    textureEnabled: true,
-//    normalEnabled: true,
-//    colorEnabled: false,
-
-//    /// Handle for buffers
-//    vertexPosition: -1,
-//    vertexTexture: -1,
-//    vertexNormal: -1,
-//    vertexColor: -1,
-//    indices: -1
-//};
 
 var box = { buffers: {} };
 
@@ -193,12 +176,12 @@ function loadCubeColorPerFace()
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, box.buffers.vertexIndices);
 	
 	var indices = [
-		0, 1, 2, 0, 2, 3, /// front face
-		4, 5, 6, 4, 6, 7, /// back face
-		8, 9, 10, 8, 10, 11, /// right face
-		12, 13, 14, 12, 14, 15, /// left face
-		16, 17, 18, 16, 18, 19, /// top face
-		20, 21, 22, 20, 22, 23  /// bottom face
+		0, 1, 2, 0, 2, 3, // front face
+		4, 5, 6, 4, 6, 7, // back face
+		8, 9, 10, 8, 10, 11, // right face
+		12, 13, 14, 12, 14, 15, // left face
+		16, 17, 18, 16, 18, 19, // top face
+		20, 21, 22, 20, 22, 23  // bottom face
 	];
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 	box.buffers.vertexIndices.itemSize = 1;

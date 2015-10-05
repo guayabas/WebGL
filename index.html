@@ -158,7 +158,8 @@ void main(void)
 <script id="shader-cs" type="x-shader/x-tessellationcontrol">/// Not active</script>
 <script id="shader-es" type="x-shader/x-tessellationevaluation">/// Not active</script>
 
-    <!-- Procedural objects ... maybe set from there ...  -->
+    <!-- Procedural objects -->
+    <script type="text/javascript" src="src/sphere.js"></script>
     <script type="text/javascript" src="src/box.js"></script>
 
     <!-- External models ... more robust please -->
@@ -212,7 +213,7 @@ void main(void)
             gl.uniform1i(shaderProgram.samplerUniform, 0);
 
             /// Lighting
-            var position = [0.0, 100.0, 0.0, 1.0];
+            var position = [0.0, 50.0, 0.0, 1.0];
             var specular = [1.0, 1.0, 1.0];
             var diffuse = [0.5, 0.5, 0.5];
             var ambient = [0.1, 0.1, 0.1];
@@ -270,6 +271,7 @@ void main(void)
 
             /// Load procedural objects
             loadCubeColorPerFace();
+            loadSphere();
 
             /// Launch
             gl.clearColor(1.0, 1.0, 1.0, 1.0);
@@ -280,6 +282,7 @@ void main(void)
             tick();
         }
 
+        /// Experimental, not functional
         function saveRender()
         {
             var canvas = document.getElementById("WebGLCanvas");
@@ -376,7 +379,7 @@ void main(void)
     </div>
     
     <div class="w3-container">
-        <canvas id="WebGLCanvas" style="width:100%; margin-left:auto; margin-right:auto; display:block"></canvas> 
+        <canvas id="WebGLCanvas" style="width:50%; margin-left:auto; margin-right:auto; display:block"></canvas> 
     </div>
     <div class="w3-row-padding">
         <a class="w3-btn w3-green" style="float: left;" onclick="toggleAnimation()">Animate</a>
