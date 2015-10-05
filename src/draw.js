@@ -50,32 +50,49 @@ function drawScene()
 	if (shadersOK)
 	{
 	    /// Choose the model to render
-	    //console.log(modelID);
+	    //console.log(localStorage.getItem("modelID"));
+
+	    
+	    var vertexPositionBufferID = box.buffers.vertexPosition;
+	    var vertexTextureBufferID = box.buffers.vertexTexture;
+	    var vertexNormalBufferID = box.buffers.vertexNormal;
+	    var vertexColorBufferID = box.buffers.vertexColor;
+
+	    var numIndices = box.buffers.indices.numItems;
+	    var indexBufferID = box.buffers.indices;
+
+
+	    /// Let the buffer variables with the following structure
+	    /// position - 3 floats
+	    /// texture - 2 floats
+	    /// normal - 3 floats
+	    /// color - 4 floats
+        /// index - 1 ints
 
 	    /// Bind buffers
-	    if (buffers.positionEnabled)
+	    //if (buffers.positionEnabled)
 	    {
-	        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertexPosition);
-	        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, buffers.vertexPosition.itemSize, gl.FLOAT, false, 0, 0);
+	        gl.bindBuffer(gl.ARRAY_BUFFER, box.buffers.vertexPosition);
+	        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
 	    }
-	    if (buffers.textureEnabled)
+	    //if (buffers.textureEnabled)
 	    {
-	        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertexTexture);
-	        gl.vertexAttribPointer(shaderProgram.vertexTextureAttribute, buffers.vertexTexture.itemSize, gl.FLOAT, false, 0, 0);
+	        gl.bindBuffer(gl.ARRAY_BUFFER, box.buffers.vertexTexture);
+	        gl.vertexAttribPointer(shaderProgram.vertexTextureAttribute, 2, gl.FLOAT, false, 0, 0);
 	    }
-	    if (buffers.normalEnabled)
+	    //if (buffers.normalEnabled)
 	    {
-	        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertexNormal);
-	        gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, buffers.vertexNormal.itemSize, gl.FLOAT, false, 0, 0);
+	        gl.bindBuffer(gl.ARRAY_BUFFER, box.buffers.vertexNormal);
+	        gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
 	    }
-	    if (buffers.colorEnabled)
+	    //if (buffers.colorEnabled)
 	    {
-	        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertexColor);
-	        gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, buffers.vertexColor.itemSize, gl.FLOAT, false, 0, 0);
+	        gl.bindBuffer(gl.ARRAY_BUFFER, box.buffers.vertexColor);
+	        gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
 	    }
-	    if (buffers.indicesEnabled)
+	    //if (buffers.indicesEnabled)
 	    {
-	        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
+	        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, box.buffers.indices);
 	    }
 
 		/// Bind texture
@@ -92,6 +109,6 @@ function drawScene()
 		/// Remember that if we are not using index buffer we could use glDrawArray(...)
 		/// but check the documentation since we need to repeat data https://www.opengl.org/sdk/docs/man3/xhtml/glDrawArrays.xml
 		/// gl.drawArrays(gl.TRIANGLES, 0, vertexPositionBuffer.numItems);
-		gl.drawElements(gl.TRIANGLES, buffers.indices.numItems, gl.UNSIGNED_SHORT, 0);
+		gl.drawElements(gl.TRIANGLES, box.buffers.indices.numItems, gl.UNSIGNED_SHORT, 0);
 	}
 }
