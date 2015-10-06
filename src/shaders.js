@@ -65,8 +65,7 @@ function loadShaders()
 	shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
 	shaderProgram.vertexTextureAttribute = gl.getAttribLocation(shaderProgram, "aVertexTexture");
 	shaderProgram.vertexNormalAttribute = gl.getAttribLocation(shaderProgram, "aVertexNormal");
-	//shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexColor");
-
+	
 	gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 	gl.enableVertexAttribArray(shaderProgram.vertexTextureAttribute);
 	gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);

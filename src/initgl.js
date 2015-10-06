@@ -5,8 +5,6 @@
  */
  
 /// Create context and dimensions
-var gl;
-
 function initGL()
 {
 	/// Get container for the WebGL display

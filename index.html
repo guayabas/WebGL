@@ -1,29 +1,21 @@
 ﻿<!--Alejandro Guayaquil-->
 <!--09.2015-->
-
-<!--Example to welcome the awesomeness of WebGL-->
-<!--I have few knowledge of layouts using HTML and CSS so I will-->
-<!--have to improve such skils for this project-->
-<!--The same goes for how to code nicely in Javascript-->
-
 <!DOCTYPE html>
 <html>
 <head>
-    <title>WebGL Toy</title>
+    <title>WebGL Learning Toy</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!--Fetch the math library-->
-    <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
+    <!-- Fetch the math library -->
+    <script type="text/javascript" src="libs/glMatrix-0.9.5.min.js"></script>
 
-    <!--jQuery-->
+    <!-- jQuery, search what is the definition of jQuery? -->
     <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+
+    <!--Responsive HTML-->
     <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
 
-<script id="shader-vs" type="x-shader/x-vertex">/// Alejandro Guayaquil 
-/// 10.2015 
-
-/// Check what is the purpose of this line
-precision mediump float;
+<script id="shader-vs" type="x-shader/x-vertex">precision mediump float;
 
 /// Properties per vertex
 attribute vec3 aVertexPosition;
@@ -81,11 +73,7 @@ void main(void)
         gl_FragColor = vColor;
     }
 }</script>
-<script id="shader-fs-phong-shading" type="x-shader/x-fragment">/// Alejandro Guayaquil
-/// 10.2015
-
-/// Check what is the purpose of this line
-precision mediump float;
+<script id="shader-fs-phong-shading" type="x-shader/x-fragment">precision mediump float;
 
 /// Input from previous stages
 varying vec2 vTexture;
@@ -165,19 +153,18 @@ void main(void)
     <!-- External models ... more robust please -->
     <script type="text/javascript" src="src/meshloader.js"></script>
 
+    <!-- My personal "rendering engine" -->
     <script type="text/javascript" src="src/textures.js"></script>
+    <script type="text/javascript" src="src/globals.js"></script>
     <script type="text/javascript" src="src/shaders.js"></script>
     <script type="text/javascript" src="src/resize.js"></script>
     <script type="text/javascript" src="src/initgl.js"></script>
     <script type="text/javascript" src="src/draw.js"></script>
 
-    <!--<script src="src/globals.js" type="text/javascript"></script>-->
     <script type="text/javascript">
-        localStorage.setItem("modelID", "0");
-
-        var animation = false;
-        var toggletex = false;
-
+        /// Goes across different files withing the browser
+        localStorage.setItem("modelID", "1");
+        
         /// Math stuff
         var projectionMatrix = mat4.create();
         var normalMatrix = mat3.create();
@@ -193,35 +180,30 @@ void main(void)
             gl.uniformMatrix4fv(shaderProgram.vMatrixUniform, false, viewMatrix);
         }
 
-        /// Animation
-        var timeClientSite = 0;
+        /// Set light
+        function setLight()
+        {
+            light.position = [0.0, 50.0, 0.0, 1.0];
+            light.specular = [1.0, 1.0, 1.0];
+            light.diffuse = [0.5, 0.5, 0.5];
+            light.ambient = [0.1, 0.1, 0.1];
+        }
 
+        /// Uniform values to the GPU
         function setUniforms()
         {
-            if (animation)
-            {
-                /// I think I should add some condition to not exceed a huge number ...
-                timeClientSite += 1;
-
-                if (timeClientSite > 360)
-                {
-                    timeClientSite = 0;
-                }
-            }
-
+            /// Animation
             gl.uniform1f(shaderProgram.timeUniform, timeClientSite);
+
+            /// Texture
             gl.uniform1i(shaderProgram.samplerUniform, 0);
+            gl.uniform1i(shaderProgram.toggleTexture, activetex);
 
             /// Lighting
-            var position = [0.0, 50.0, 0.0, 1.0];
-            var specular = [1.0, 1.0, 1.0];
-            var diffuse = [0.5, 0.5, 0.5];
-            var ambient = [0.1, 0.1, 0.1];
-
-            gl.uniform4fv(shaderProgram.pLightUniform, position);
-            gl.uniform3fv(shaderProgram.sLightUniform, specular);
-            gl.uniform3fv(shaderProgram.dLightUniform, diffuse);
-            gl.uniform3fv(shaderProgram.aLightUniform, ambient);
+            gl.uniform4fv(shaderProgram.pLightUniform, light.position);
+            gl.uniform3fv(shaderProgram.sLightUniform, light.specular);
+            gl.uniform3fv(shaderProgram.dLightUniform, light.diffuse);
+            gl.uniform3fv(shaderProgram.aLightUniform, light.ambient);
         }
 
         /// Update
@@ -229,6 +211,14 @@ void main(void)
         {
             /// http://learningwebgl.com/blog/?p=3189
             requestAnimationFrame(tick);
+
+            /// Animation
+            if (animation)
+            {
+                timeClientSite++;
+                if (timeClientSite > 360) timeClientSite = 0;
+            }
+
             drawScene();
         }
 
@@ -241,8 +231,16 @@ void main(void)
         /// Toggle texture
         function toggleTexture()
         {
-            toggletex = !toggletex;
-            gl.uniform1i(shaderProgram.toggleTexture, toggletex);
+            activetex = !activetex;
+
+            if (activetex)
+            {
+                document.getElementById("btnTexture").innerHTML = "Disable Texture"
+            }
+            else
+            {
+                document.getElementById("btnTexture").innerHTML = "Enable Texture"
+            }
         }
 
         /// Reload texture
@@ -263,15 +261,18 @@ void main(void)
             /// Load the beautiful shaders
             loadShaders();
 
-            /// Load the image
-            initTextures("images/Brick.jpg");
+            /// Load an image
+            loadTexture();
 
-            /// Load the model
-            loadMesh("Teapot.json");
+            /// Load external model
+            loadMesh();
 
             /// Load procedural objects
             loadCubeColorPerFace();
             loadSphere();
+
+            /// Create the point light
+            setLight();
 
             /// Launch
             gl.clearColor(1.0, 1.0, 1.0, 1.0);
@@ -360,7 +361,10 @@ void main(void)
             var URL = "assets/predefinedModels.html";
             window.open(URL, "", specificationsChildWindow);
         }
+
     </script>
+    <style>
+    </style>
 </head>
 <body onload="WebGLInitializer()">
     <!-- The layout of the web page -->
@@ -369,24 +373,32 @@ void main(void)
     </header>
 
     <!--Our body, the beautiful stuff comes here-->
-    <div class="w3-row-padding">
-        <div class="w3-half">
-            <input class="w3-container" id="inputURLImage" style="width:100%; height:35px;" type="text" value="images/GoogleAndroid.jpg" required>
-        </div>
-        <div class="w3-half">
-            <a class="w3-btn w3-green" style="width:100%;" onclick="reloadTextureImage()">Load Image</a>
-        </div>
-    </div>
+    <!--<div class="w3-row-padding">-->
+    <!--    <div class="w3-half">-->
+    <!--        <input class="w3-container" id="inputURLImage" style="width:100%; height:35px;" type="text" value="images/GoogleAndroid.jpg" required>-->
+    <!--    </div>-->
+    <!--    <div class="w3-half">-->
+    <!--        <a class="w3-btn w3-green" style="width:100%;" onclick="reloadTextureImage()">Load Image</a>-->
+    <!--    </div>-->
+    <!--</div>-->
     
     <div class="w3-container">
-        <canvas id="WebGLCanvas" style="width:50%; margin-left:auto; margin-right:auto; display:block"></canvas> 
+        <a class="w3-btn w3-indigo" style="width:100%;" onclick="openWindowPredefinedModels()">Select Model</a>
     </div>
+    <div class="w3-container">
+        <canvas id="WebGLCanvas" style="width:80%; margin-left:auto; margin-right:auto; display:block"></canvas>
+    </div>
+    <div class="w3-container">
+        <a class="w3-btn w3-red" style="width:100%;" onclick="toggleTexture()" id="btnTexture">Enable Texture</a>
+    </div>
+
     <div class="w3-row-padding">
-        <a class="w3-btn w3-green" style="float: left;" onclick="toggleAnimation()">Animate</a>
-        <a class="w3-btn w3-red" style="float: left;" onclick="toggleTexture()">Toggle Texture</a>
-        <a class="w3-btn w3-teal" style="float: left;" onclick="saveRender()">Save Render</a>
-        <a class="w3-btn w3-blue" style="float: right;" onclick="loadShaders()">Compile</a>
-        <a class="w3-btn w3-indigo" style="float:right;" onclick="openWindowPredefinedModels()">Select Model</a>
+        <div class="w3-half">
+            <a class="w3-btn w3-green" style="width:100%" onclick="toggleAnimation()">Animate</a>
+        </div>
+        <div class="w3-half">
+            <a class="w3-btn w3-blue" style="width:100%" onclick="loadShaders()">Compile</a>
+        </div>
     </div>
     
     <div class="w3-row-padding">
@@ -398,6 +410,7 @@ void main(void)
             <textarea type="text" cols="60" id="inputVS"></textarea> <br />
         </div>
         <div class="w3-half">
+            
             <!-- Fragment shader input -->
             <div class="w3-container w3-indigo">
                 <h4>Fragment Shader</h4>
@@ -410,10 +423,10 @@ void main(void)
     </footer>
 
     <!--Code syntax highlight http://codemirror.net/-->
-    <script src="codemirror/lib/codemirror.js"></script>
-    <script src="codemirror/addon/edit/matchbrackets.js"></script>
-    <link rel="stylesheet" href="codemirror/lib/codemirror.css">
-    <script src="codemirror/mode/clike/clike.js"></script>
+    <script src="libs/codemirror/lib/codemirror.js"></script>
+    <script src="libs/codemirror/addon/edit/matchbrackets.js"></script>
+    <link rel="stylesheet" href="libs/codemirror/lib/codemirror.css">
+    <script src="libs/codemirror/mode/clike/clike.js"></script>
 
 </body>
 </html>

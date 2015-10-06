@@ -5,10 +5,12 @@
  */
 
 /// Request for loading (Supporting .JSON)
-function loadMesh(modelName)
+function loadMesh(pathToModel)
 {
+    pathToModel = typeof pathToModel !== 'undefined' ? pathToModel : "assets/models/Teapot.json";
+
     var request = new XMLHttpRequest();
-    request.open("GET", modelName, true);
+    request.open("GET", pathToModel, true);
     
     request.onreadystatechange = function()
     {

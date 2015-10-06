@@ -13,14 +13,14 @@ function degreeToRadians(degrees)
 /// Translate camera
 function translateCamera()
 {
-	mat4.translate(viewMatrix, [0.0, 0.0, -80.0]);
+	mat4.translate(viewMatrix, [0.0, 0.0, -70.0]);
 }
  
 /// Rotate camera
 function rotateCamera()
 {
 	mat4.rotate(viewMatrix, degreeToRadians(timeClientSite), [0.0, 1.0, 0.0]);
-	//mat4.rotate(viewMatrix, degreeToRadians(+45.0), [0.0, 1.0, 0.0]);
+	mat4.rotate(viewMatrix, degreeToRadians(+45.0), [0.0, 1.0, 0.0]);
 	mat4.rotate(viewMatrix, degreeToRadians(+45.0), [1.0, 0.0, 0.0]);
 }
  

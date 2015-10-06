@@ -7,7 +7,7 @@
 /// Resize container
 function resize(gl) 
 {
-	//http://webglfundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
+	/// http://webglfundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
 	var realToCSSPixels = window.devicePixelRatio || 1;
 
 	// Lookup the size the browser is displaying the canvas in CSS pixels

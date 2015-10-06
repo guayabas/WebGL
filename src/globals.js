@@ -1,6 +1,20 @@
 /**
- * @fileoverview Initialize buffers
+ * @fileoverview Some global variables
  * @author Alejandro Guayaquil
  * @version 1.0.0
  */
- var modelID = -1;
+
+/// Initialize define empty objects, later fill them ... 
+var light =
+{
+    position: [],
+    specular: [],
+    diffuse: [],
+    ambient: []
+}
+
+var timeClientSite = 0;
+var activetex = false;
+var animation = false;
+var textureID = -1;
+var gl = null;

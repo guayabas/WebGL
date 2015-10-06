@@ -4,14 +4,15 @@
  * @version 1.0.0
  */
  
-var textureID;
- 
-function initTextures(pathToTexture)
+function loadTexture(pathToTexture)
 {
+    pathToTexture = typeof pathToTexture !== 'undefined' ? pathToTexture : "assets/textures/Image01.jpg";
+
 	textureID = gl.createTexture();
 	textureID.image = new Image();
 	
-	textureID.image.onload = function() {
+	textureID.image.onload = function ()
+	{
 		/// Bind the current texture to set parameters
         gl.bindTexture(gl.TEXTURE_2D, textureID);
 		
@@ -31,7 +32,4 @@ function initTextures(pathToTexture)
 	
 	/// Load source of the image
 	textureID.image.src = pathToTexture;
-	
-	/// Print information of the image
-	/// console.log(textureID);
 }
