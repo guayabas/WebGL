@@ -5,6 +5,9 @@
  */
 
 /// Request for loading (Supporting .JSON)
+/// WARNING: Chrome seems to be secure enough to not admit the protocol for 
+/// loading the object. Test over Firefox when developing, will save some time
+/// debugging some values that are correct but just Chrome will disable them
 function loadMesh(pathToModel)
 {
     pathToModel = typeof pathToModel !== 'undefined' ? pathToModel : "assets/models/Teapot.json";

@@ -25,4 +25,7 @@ function initGL()
 	
 	/// Resize the pixels to match the container
 	resize(gl);
+
+	/// Mouse event
+	canvas.onmousedown = handleMouseDown;
 }

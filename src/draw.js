@@ -3,13 +3,7 @@
  * @author Alejandro Guayaquil
  * @version 1.0.0
  */
- 
-/// To radians
-function degreeToRadians(degrees)
-{
-	return (degrees * (Math.PI / 180.0));
-}
- 
+  
 /// Translate camera
 function translateCamera()
 {
@@ -20,8 +14,6 @@ function translateCamera()
 function rotateCamera()
 {
 	mat4.rotate(viewMatrix, degreeToRadians(timeClientSite), [0.0, 1.0, 0.0]);
-	mat4.rotate(viewMatrix, degreeToRadians(+45.0), [0.0, 1.0, 0.0]);
-	mat4.rotate(viewMatrix, degreeToRadians(+45.0), [1.0, 0.0, 0.0]);
 }
  
 /// Draw objects
@@ -37,9 +29,9 @@ function drawScene()
 	mat4.identity(viewMatrix);
 	translateCamera();
 	rotateCamera();	
-	
-	/// Create model matrix
-	mat4.identity(modelMatrix);
+
+	/// WARNING: The model matrix is defined in the mouse.js file since handles
+	/// the mouse events and yes is maybe a bad design but meh, works, have fun!
 
 	/// Compute normal matrix
 	mat4.identity(mvMatrix);
