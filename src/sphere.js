@@ -79,11 +79,11 @@ function loadSphere(radius, latitudeBands, longitudeBands)
     sphere.buffers.vertexNormal.numItems = normalData.length / 3;
 
     /// raw 2D image data
-    sphere.buffers.vertexTexture = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, sphere.buffers.vertexTexture);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureData), gl.STATIC_DRAW);
-    sphere.buffers.vertexTexture.itemSize = 2;
-    sphere.buffers.vertexTexture.numItems = textureData.length / 2;
+    //sphere.buffers.vertexTexture = gl.createBuffer();
+    //gl.bindBuffer(gl.ARRAY_BUFFER, sphere.buffers.vertexTexture);
+    //gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureData), gl.STATIC_DRAW);
+    //sphere.buffers.vertexTexture.itemSize = 2;
+    //sphere.buffers.vertexTexture.numItems = textureData.length / 2;
 
     /// 16bit indices 
     sphere.buffers.vertexIndices = gl.createBuffer();

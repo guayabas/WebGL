@@ -5,6 +5,8 @@
  */
  
  var mouseDown = false;
+ var altModifier = false;
+ var shiftModifier = false;
  var lastPositionMouseX = null;
  var lastPositionMouseY = null;
 
@@ -30,14 +32,39 @@
  	var deltaX = (currentMousePositionX - lastPositionMouseX);
  	var deltaY = (currentMousePositionY - lastPositionMouseY);
 
- 	/// The rotation matrix handles the degrees the current
- 	/// object has been rotated in the X, Y direction.
- 	/// Recall the Euler angles ... 
- 	var rotationMatrix = mat4.create();
- 	mat4.identity(rotationMatrix);
- 	mat4.rotate(rotationMatrix, degreeToRadians(deltaX), [0.0, 1.0, 0.0]);
- 	mat4.rotate(rotationMatrix, degreeToRadians(deltaY), [1.0, 0.0, 0.0]);
- 	mat4.multiply(rotationMatrix, modelMatrix, modelMatrix);
+ 	if (!shiftModifier)
+ 	{
+
+ 		if (!altModifier)
+ 		{
+ 			/// The rotation matrix handles the degrees the current
+		 	/// object has been rotated in the X, Y direction.
+		 	/// Recall the Euler angles ... 
+		 	var rotationMatrix = mat4.create();
+		 	mat4.identity(rotationMatrix);
+		 	mat4.rotate(rotationMatrix, degreeToRadians(deltaX), [0.0, 1.0, 0.0]);
+		 	mat4.rotate(rotationMatrix, degreeToRadians(deltaY), [1.0, 0.0, 0.0]);
+		 	mat4.multiply(rotationMatrix, modelMatrix, modelMatrix);
+ 		}
+ 		else
+ 		{
+ 			var translationMatrix = mat4.create();
+ 			mat4.identity(translationMatrix);
+ 			mat4.translate(translationMatrix, [deltaX * 0.1, 0.0, 0.0]);
+ 			mat4.translate(translationMatrix, [0.0, -deltaY * 0.1, 0.0]);
+ 			mat4.multiply(translationMatrix, modelMatrix, modelMatrix);
+ 		}
+ 		
+ 	}
+ 	else
+ 	{
+ 		simpleCamera.zoom += deltaX;
+
+ 		if (simpleCamera.zoom >= 0)
+ 		{
+ 			simpleCamera.zoom = 0;
+ 		}
+ 	}
 
  	lastPositionMouseX = currentMousePositionX;
  	lastPositionMouseY = currentMousePositionY;

@@ -7,7 +7,7 @@
 /// Translate camera
 function translateCamera()
 {
-	mat4.translate(viewMatrix, [0.0, 0.0, -70.0]);
+	mat4.translate(viewMatrix, [0.0, 0.0, simpleCamera.zoom]);
 }
  
 /// Rotate camera
@@ -44,9 +44,30 @@ function drawScene()
 	    /// Choose the model to render
 	    var currentMeshID = parseInt(localStorage.getItem("modelID"));
 
+	    /// Not the best choice ... but works, move it to another function
+	    /// that is not called per tick
+	    var loadModel = parseInt(localStorage.getItem("loadNewModel"));
+	    if (loadModel == 1)
+        {
+            /// Teapot
+            if (currentMeshID == 2)
+                loadMesh("assets/models/Teapot.json");
+            /// Bunny
+            if (currentMeshID == 3)
+                loadMesh("assets/models/Bunny.json");
+            /// Knot
+            if (currentMeshID == 4)
+                loadMesh("assets/models/Knot.json");
+            /// Button
+            if (currentMeshID == 5)
+                loadMesh("assets/models/Button.json");
+        
+            localStorage.loadNewModel = 0;
+        }
+
         /// Maybe just use one buffer and padding
 	    var vertexPositionBufferID;
-	    var vertexTextureBufferID;
+	    //var vertexTextureBufferID;
 	    var vertexNormalBufferID;
 	    var vertexColorBufferID;
 	    var indexBufferID;
@@ -60,20 +81,21 @@ function drawScene()
 	        vertexNormalBufferID = box.buffers.vertexNormal;
 	        indexBufferID = box.buffers.vertexIndices;
 	    }
-        /// Mesh
+        /// Sphere
 	    else if (currentMeshID == 1)
-	    {
-	        vertexPositionBufferID = mesh.buffers.vertexPosition;
-	        vertexTextureBufferID = mesh.buffers.vertexTexture;
-	        vertexNormalBufferID = mesh.buffers.vertexNormal;
-	        indexBufferID = mesh.buffers.vertexIndices;
-	    }
-	    else if (currentMeshID == 2)
 	    {
 	        vertexPositionBufferID = sphere.buffers.vertexPosition;
 	        vertexTextureBufferID = sphere.buffers.vertexTexture;
 	        vertexNormalBufferID = sphere.buffers.vertexNormal;
 	        indexBufferID = sphere.buffers.vertexIndices;
+	    }
+	    /// Any Mesh!
+	    else if (currentMeshID >= 2)
+	    {
+	        vertexPositionBufferID = mesh.buffers.vertexPosition;
+	        vertexTextureBufferID = mesh.buffers.vertexTexture;
+	        vertexNormalBufferID = mesh.buffers.vertexNormal;
+	        indexBufferID = mesh.buffers.vertexIndices;
 	    }
 
 	    /// Bind buffers
@@ -83,8 +105,8 @@ function drawScene()
 	        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
 	    }
 	    {
-	        gl.bindBuffer(gl.ARRAY_BUFFER, vertexTextureBufferID);
-	        gl.vertexAttribPointer(shaderProgram.vertexTextureAttribute, 2, gl.FLOAT, false, 0, 0);
+	        //gl.bindBuffer(gl.ARRAY_BUFFER, vertexTextureBufferID);
+	        //gl.vertexAttribPointer(shaderProgram.vertexTextureAttribute, 2, gl.FLOAT, false, 0, 0);
 	    }
 	    {
 	        gl.bindBuffer(gl.ARRAY_BUFFER, vertexNormalBufferID);
@@ -95,8 +117,8 @@ function drawScene()
 	    }
 
 		/// Bind texture
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, textureID);
+        //gl.activeTexture(gl.TEXTURE0);
+        //gl.bindTexture(gl.TEXTURE_2D, textureID);
 		
 		/// Set matrices in the GPU
 		setMatrixUniforms();
@@ -107,7 +129,20 @@ function drawScene()
 		/// Finally, RENDER!
 		/// Remember that if we are not using index buffer we could use glDrawArray(...)
 		/// but check the documentation since we need to repeat data https://www.opengl.org/sdk/docs/man3/xhtml/glDrawArrays.xml
-		/// gl.drawArrays(gl.TRIANGLES, 0, vertexPositionBuffer.numItems);
-		gl.drawElements(gl.TRIANGLES, indexBufferID.numItems, gl.UNSIGNED_SHORT, 0);
+		//gl.drawArrays(gl.TRIANGLES, 0, vertexPositionBufferID.numItems);
+
+		/// Check the types of rendering in OpenGL 3.3 >= since I am not sure this is the most efficient
+		/// way for rendering wireframe
+		var renderingType;
+		if (wireframe)
+		{
+			renderingType = gl.LINES;
+		}
+		else
+		{
+			renderingType = gl.TRIANGLES;
+		}			
+		gl.drawElements(renderingType, indexBufferID.numItems, gl.UNSIGNED_SHORT, 0);
+		
 	}
 }

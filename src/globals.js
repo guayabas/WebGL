@@ -13,8 +13,14 @@ var light =
     ambient: []
 }
 
+var simpleCamera = 
+{
+	zoom: -70.0
+}
+
 var timeClientSite = 0;
 var activetex = false;
 var animation = false;
+var wireframe = false;
 var textureID = -1;
 var gl = null;

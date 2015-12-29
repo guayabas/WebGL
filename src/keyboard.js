@@ -10,8 +10,7 @@
  function handleKeyDown(event)
  {
  	currentlyPressedKey[event.keyCode] = true;
-
- 	console.log(event.keyCode);
+ 	//console.log(event.keyCode);
  }
 
  function handleKeyUp(event)
@@ -27,4 +26,12 @@
  	{
  		mat4.identity(modelMatrix);
  	}
+
+ 	if (currentlyPressedKey[87])
+ 	{
+ 		wireframe = !wireframe;
+ 	}
+
+ 	shiftModifier = currentlyPressedKey[16];
+ 	altModifier = currentlyPressedKey[18];
  }

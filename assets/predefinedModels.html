@@ -1,41 +1,71 @@
 ﻿<!--Alejandro Guayaquil-->
-<!--10.2015-->
+<!--01.2016-->
 <!DOCTYPE html>
 <html>
 <head>
     <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+    <script type="text/javascript" src="../src/meshloader.js"></script>
     <script type="text/javascript">
-        function setMeshModelID(value)
+        function setMeshModelID(value, procedural)
         {
             localStorage.modelID = value;
+            localStorage.loadNewModel = procedural;
         }
     </script>
 </head>
 <body>
     <div class="w3-row-padding">
         <div class="w3-third">
-            <a href="javascript:setMeshModelID(0), window.close();">
+            <a href="javascript:setMeshModelID(0, 0), window.close();">
                 <div class="w3-card-2">
                     <img src="preview/renderA.png" style="width:100%" />
                 </div>
             </a>
         </div>
         <div class="w3-third">
-            <a href="javascript:setMeshModelID(1), window.close();">
+            <a href="javascript:setMeshModelID(1, 0), window.close();">
                 <div class="w3-card-2">
                     <img src="preview/renderB.png" style="width:100%" />
                 </div>
             </a>
         </div>
         <div class="w3-third">
-            <a href="javascript:setMeshModelID(2), window.close();">
+            <a href="javascript:setMeshModelID(2, 1), window.close();">
                 <div class="w3-card-2">
                     <img src="preview/renderC.png" style="width:100%" />
                 </div>
             </a>
         </div>
     </div>
-
+        <br>
+    <div>
+    </div>
+    <div class="w3-row-padding">
+        <div class="w3-third">
+            <a href="javascript:setMeshModelID(3, 1), window.close();">
+                <div class="w3-card-2">
+                    <img src="preview/renderD.png" style="width:100%" />
+                </div>
+            </a>
+        </div>
+        <div class="w3-third">
+            <a href="javascript:setMeshModelID(4, 1), window.close();">
+                <div class="w3-card-2">
+                    <img src="preview/renderE.png" style="width:100%" />
+                </div>
+            </a>
+        </div>
+        <div class="w3-third">
+            <a href="javascript:setMeshModelID(5, 1), window.close();">
+                <div class="w3-card-2">
+                    <img src="preview/renderF.png" style="width:100%" />
+                </div>
+            </a>
+        </div>
+    </div>
+    </div>
+        <br>
+    <div>
     <div class="w3-container w3-center">
         <a class="w3-btn" onclick="window.close();">Close Window</a>
     </div>
