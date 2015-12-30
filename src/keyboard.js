@@ -10,7 +10,6 @@
  function handleKeyDown(event)
  {
  	currentlyPressedKey[event.keyCode] = true;
- 	//console.log(event.keyCode);
  }
 
  function handleKeyUp(event)

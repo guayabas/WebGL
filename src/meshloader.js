@@ -14,6 +14,7 @@ function loadMesh(pathToModel)
 
     var request = new XMLHttpRequest();
     request.open("GET", pathToModel, true);
+	request.overrideMimeType("application/json");
     
     request.onreadystatechange = function()
     {
@@ -45,11 +46,11 @@ function meshLoader(meshData)
 	mesh.buffers.vertexNormal.numItems = meshData.vertexNormals.length / 3;
 
 	/// raw 2D image data
-	//mesh.buffers.vertexTexture = gl.createBuffer();
-	//gl.bindBuffer(gl.ARRAY_BUFFER, mesh.buffers.vertexTexture);
-	//gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(meshData.vertexTextures), gl.STATIC_DRAW);
-	//mesh.buffers.vertexTexture.itemSize = 2;
-	//mesh.buffers.vertexTexture.numItems = meshData.vertexTextures.length / 2;
+	mesh.buffers.vertexTexture = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, mesh.buffers.vertexTexture);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(meshData.vertexTextures), gl.STATIC_DRAW);
+	mesh.buffers.vertexTexture.itemSize = 2;
+	mesh.buffers.vertexTexture.numItems = meshData.vertexTextures.length / 2;
 	
 	/// 16bit indices 
 	mesh.buffers.vertexIndices = gl.createBuffer();

@@ -4,12 +4,12 @@
  * @version 1.0.0
  */
  
- var mouseDown = false;
- var altModifier = false;
- var shiftModifier = false;
  var lastPositionMouseX = null;
  var lastPositionMouseY = null;
-
+ var shiftModifier = false;
+ var altModifier = false;
+ var mouseDown = false;
+ 
  function handleMouseDown(event)
  {
  	mouseDown = true;
@@ -32,9 +32,10 @@
  	var deltaX = (currentMousePositionX - lastPositionMouseX);
  	var deltaY = (currentMousePositionY - lastPositionMouseY);
 
+	var translationSensitivity = 0.01;
+	
  	if (!shiftModifier)
  	{
-
  		if (!altModifier)
  		{
  			/// The rotation matrix handles the degrees the current
@@ -50,11 +51,10 @@
  		{
  			var translationMatrix = mat4.create();
  			mat4.identity(translationMatrix);
- 			mat4.translate(translationMatrix, [deltaX * 0.1, 0.0, 0.0]);
- 			mat4.translate(translationMatrix, [0.0, -deltaY * 0.1, 0.0]);
+ 			mat4.translate(translationMatrix, [deltaX * translationSensitivity, 0.0, 0.0]);
+ 			mat4.translate(translationMatrix, [0.0, -deltaY * translationSensitivity, 0.0]);
  			mat4.multiply(translationMatrix, modelMatrix, modelMatrix);
- 		}
- 		
+ 		}	
  	}
  	else
  	{

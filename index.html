@@ -20,8 +20,9 @@
 
 /// Properties per vertex
 attribute vec3 aVertexPosition;
-//attribute vec2 aVertexTexture;
+attribute vec2 aVertexTexture;
 attribute vec3 aVertexNormal;
+attribute vec4 aVertexColor;
 
 /// Variable from the CPU
 uniform float uTime;
@@ -32,14 +33,16 @@ uniform mat4 uV;
 uniform mat4 uP;
 
 /// Output variables for next stages
-//varying vec2 vTexture;
+varying vec2 vTexture;
 varying vec3 vNormal;
 varying vec4 vVertex;
+varying vec4 vColor;
 
 void main(void)
 {
-    //vTexture = aVertexTexture;
+    vTexture = aVertexTexture;
     vNormal = aVertexNormal;
+	vColor = aVertexColor;
 
     /// The product ModelView is done for the lighting
     /// in the next vertex stage
@@ -82,6 +85,7 @@ void main(void)
 varying vec2 vTexture;
 varying vec4 vVertex;
 varying vec3 vNormal;
+varying vec4 vColor;
 
 /// Lighting requires the view and normal matrix.
 /// Just one! not per vertex or fragment
@@ -95,23 +99,24 @@ uniform vec3 uLightSpecular;
 uniform vec4 uLightPosition;
 
 /// Toggle texture
-//uniform int uToggleTexture;
+uniform int uToggleTexture;
 
 /// ID for the texture
-//uniform sampler2D uSamplerTexture;
+uniform sampler2D uSamplerTexture;
 
 void main(void)
 {
     vec3 material;
-    //if (uToggleTexture > 0)
-    //{
+    if (uToggleTexture > 0)
+    {
         /// Fecth the coordinates from the image and apply to the pixels
-    //    material = texture2D(uSamplerTexture, vTexture).xyz;
-    //}
-    //else
-    //{
-        material = vec3(1, 1, 1);
-    //}
+        material = mix(texture2D(uSamplerTexture, vTexture).xyz, vColor.xyz, 0.5);
+    }
+    else
+    {
+		/// Fetch color from vertex
+        material = vColor.xyz;
+    }
 
     /// All equations refer to the slides of the course
     vec3 v = -vVertex.xyz;
@@ -149,10 +154,11 @@ void main(void)
 <script id="shader-es" type="x-shader/x-tessellationevaluation">/// Not active</script>
 
     <!-- Procedural objects -->
+	<script type="text/javascript" src="src/cylinder.js"></script>
     <script type="text/javascript" src="src/sphere.js"></script>
     <script type="text/javascript" src="src/box.js"></script>
 
-    <!-- External models ... try some real models from Maya or other software -->
+    <!-- External models, works! but needs a preconverter to JSON format-->
     <script type="text/javascript" src="src/meshloader.js"></script>
 
     <!-- My personal "rendering engine" -->
@@ -202,8 +208,8 @@ void main(void)
             gl.uniform1f(shaderProgram.timeUniform, timeClientSite);
 
             /// Texture
-            //gl.uniform1i(shaderProgram.samplerUniform, 0);
-            //gl.uniform1i(shaderProgram.toggleTexture, activetex);
+            gl.uniform1i(shaderProgram.samplerUniform, 0);
+            gl.uniform1i(shaderProgram.toggleTexture, activetex);
 
             /// Lighting
             gl.uniform4fv(shaderProgram.pLightUniform, light.position);
@@ -265,7 +271,7 @@ void main(void)
             initTextures(urlText);
         }
 
-        /// Initializer
+        /// WebGL Initializer
         function WebGLInitializer()
         {
             /// Create context
@@ -282,6 +288,7 @@ void main(void)
 
             /// Load procedural objects
             loadCubeColorPerFace();
+			loadCylinder();
             loadSphere();
 
             /// Create the point light
@@ -306,13 +313,7 @@ void main(void)
             tick();
         }
 
-        /// Experimental, not functional
-        function saveRender()
-        {
-            var canvas = document.getElementById("WebGLCanvas");
-            var img = canvas.toDataURL("image/png");
-        }
-
+		/// HTML initializer
         $(document).ready(function () {
             $("#inputVS").append($("#shader-vs").text());
             $("#inputFS").append($("#shader-fs-phong-shading").text());

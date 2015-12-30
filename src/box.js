@@ -133,43 +133,43 @@ function loadCubeColorPerFace()
 	box.buffers.vertexNormal.numItems = 24;
 
 	/// raw 2D image data
-	//box.buffers.vertexTexture = gl.createBuffer();
-	//gl.bindBuffer(gl.ARRAY_BUFFER, box.buffers.vertexTexture);
+	box.buffers.vertexTexture = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, box.buffers.vertexTexture);
 
-	//var textures = [
-	//0.0, 0.0, 
-	//1.0, 0.0,
-	//1.0, 1.0,
-	//0.0, 1.0,
+	var textures = [
+	0.0, 0.0, 
+	1.0, 0.0,
+	1.0, 1.0,
+	0.0, 1.0,
 	
-	//0.0, 0.0,
-	//1.0, 0.0,
-	//1.0, 1.0,
-	//0.0, 1.0,
+	0.0, 0.0,
+	1.0, 0.0,
+	1.0, 1.0,
+	0.0, 1.0,
 	
-	//0.0, 0.0,
-	//1.0, 0.0,
-	//1.0, 1.0,
-	//0.0, 1.0,
+	0.0, 0.0,
+	1.0, 0.0,
+	1.0, 1.0,
+	0.0, 1.0,
 	
-	//0.0, 0.0,
-	//1.0, 0.0,
-	//1.0, 1.0,
-	//0.0, 1.0,
+	0.0, 0.0,
+	1.0, 0.0,
+	1.0, 1.0,
+	0.0, 1.0,
 	
-	//0.0, 0.0,
-	//1.0, 0.0,
-	//1.0, 1.0,
-	//0.0, 1.0,
+	0.0, 0.0,
+	1.0, 0.0,
+	1.0, 1.0,
+	0.0, 1.0,
 	
-	//0.0, 0.0,
-	//1.0, 0.0,
-	//1.0, 1.0,
-	//0.0, 1.0
-	//];
-	//gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures), gl.STATIC_DRAW);
-	//box.buffers.vertexTexture.itemSize = 2;
-	//box.buffers.vertexTexture.numItems = 24;
+	0.0, 0.0,
+	1.0, 0.0,
+	1.0, 1.0,
+	0.0, 1.0
+	];
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures), gl.STATIC_DRAW);
+	box.buffers.vertexTexture.itemSize = 2;
+	box.buffers.vertexTexture.numItems = 24;
 	
 	/// 16bit Indices 
 	box.buffers.vertexIndices = gl.createBuffer();
