@@ -69,7 +69,6 @@ function drawScene()
 			/// Jeep
 			if (currentMeshID == 8)
                 loadMesh("assets/models/jeep.json");
-        
 			
 			setTimeout(function(){
 				setModelMatrix();

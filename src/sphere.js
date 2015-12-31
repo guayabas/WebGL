@@ -9,7 +9,7 @@ var sphere = { buffers: null };
 /// http://learningwebgl.com/blog/?p=1253
 function loadSphere(radius, latitudeBands, longitudeBands)
 {
-	buffers = {};
+	sphere.buffers = {};
 	
     longitudeBands = typeof longitudeBands !== 'undefined' ? longitudeBands : 20;
     latitudeBands = typeof latitudeBands !== 'undefined' ? latitudeBands : 20;
