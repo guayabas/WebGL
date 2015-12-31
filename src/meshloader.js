@@ -45,12 +45,47 @@ function meshLoader(meshData)
 	mesh.buffers.vertexNormal.itemSize = 3;
 	mesh.buffers.vertexNormal.numItems = meshData.vertexNormals.length / 3;
 
+	/// Make the color procedural, expensive data so later fetch from file
+	var numVertices = mesh.buffers.vertexPosition.numItems;
+	var colorData = [];
+	var redChannel = Math.random();
+	var greenChannel = Math.random();
+	var blueChannel = Math.random();
+	for (var vertex = 0; vertex < numVertices; vertex++)
+	{
+		colorData.push(redChannel);
+		colorData.push(greenChannel);
+		colorData.push(blueChannel);
+		colorData.push(1.0);
+	}
+	mesh.buffers.vertexColor = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, mesh.buffers.vertexColor);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorData), gl.STATIC_DRAW);
+	mesh.buffers.vertexColor.itemSize = 4;
+	mesh.buffers.vertexColor.numItems = colorData.length / 4;
+	
 	/// raw 2D image data
 	mesh.buffers.vertexTexture = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, mesh.buffers.vertexTexture);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(meshData.vertexTextures), gl.STATIC_DRAW);
+	var textures;
+	if (meshData.vertexTextures === undefined || meshData.vertexTextures.length == 0)
+	{
+		var textureData = [];
+		for (var vertex = 0; vertex < numVertices; vertex++)
+		{
+			/// Fix to actually do the texture mapping!
+			textureData.push(0.0);
+			textureData.push(0.0);
+		}
+		textures = textureData;
+	}
+	else
+	{
+		textures = meshData.vertexTextures;
+	}
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures), gl.STATIC_DRAW);
 	mesh.buffers.vertexTexture.itemSize = 2;
-	mesh.buffers.vertexTexture.numItems = meshData.vertexTextures.length / 2;
+	mesh.buffers.vertexTexture.numItems = textures.length / 2;
 	
 	/// 16bit indices 
 	mesh.buffers.vertexIndices = gl.createBuffer();

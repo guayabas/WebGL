@@ -17,6 +17,7 @@ function loadSphere(radius, latitudeBands, longitudeBands)
     var positionData = [];
     var textureData = [];
     var normalData = [];
+	var colorData = [];
     for (var latNumber = 0; latNumber <= latitudeBands; latNumber++) {
         var theta = latNumber * Math.PI / latitudeBands;
         var sinTheta = Math.sin(theta);
@@ -44,6 +45,10 @@ function loadSphere(radius, latitudeBands, longitudeBands)
             normalData.push(x);
             normalData.push(y);
             normalData.push(z);
+			colorData.push(1.0);
+			colorData.push(0.0);
+			colorData.push(0.0);
+			colorData.push(1.0);
         }
     }
 
@@ -77,6 +82,13 @@ function loadSphere(radius, latitudeBands, longitudeBands)
     sphere.buffers.vertexNormal.itemSize = 3;
     sphere.buffers.vertexNormal.numItems = normalData.length / 3;
 
+	/// raw RGBA color data
+	sphere.buffers.vertexColor = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, sphere.buffers.vertexColor);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorData), gl.STATIC_DRAW);
+	sphere.buffers.vertexColor.itemSize = 4;
+	sphere.buffers.vertexColor.numItems = colorData.length / 4;
+	
     /// raw 2D image data
     sphere.buffers.vertexTexture = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, sphere.buffers.vertexTexture);

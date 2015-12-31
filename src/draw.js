@@ -14,6 +14,8 @@ function translateCamera()
 function rotateCamera()
 {
 	mat4.rotate(viewMatrix, degreeToRadians(timeClientSite), [0.0, 1.0, 0.0]);
+	//mat4.rotate(viewMatrix, degreeToRadians(-45.0), [0.0, 1.0, 0.0]);
+	//mat4.rotate(viewMatrix, degreeToRadians(+45.0), [1.0, 0.0, 0.0]);
 }
  
 /// Draw objects
@@ -58,9 +60,6 @@ function drawScene()
             /// Knot
             if (currentMeshID == 5)
                 loadMesh("assets/models/Knot.json");
-            /// Button
-            if (currentMeshID == 6)
-                loadMesh("assets/models/Button.json");
         
             localStorage.loadNewModel = 0;
         }
@@ -101,7 +100,7 @@ function drawScene()
 	        indexBufferID = cylinder.buffers.vertexIndices;
 		}
 	    /// Any Mesh! (To support reading the material from file ... )
-	    else if (currentMeshID >= 2)
+	    else if (currentMeshID > 2)
 	    {
 	        vertexPositionBufferID = mesh.buffers.vertexPosition;
 	        vertexTextureBufferID = mesh.buffers.vertexTexture;

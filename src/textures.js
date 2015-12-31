@@ -6,7 +6,7 @@
  
 function loadTexture(pathToTexture)
 {
-    pathToTexture = typeof pathToTexture !== 'undefined' ? pathToTexture : "assets/textures/Image01.jpg";
+    pathToTexture = typeof pathToTexture !== 'undefined' ? pathToTexture : "assets/textures/Image03.jpg";
 
 	textureID = gl.createTexture();
 	textureID.image = new Image();
