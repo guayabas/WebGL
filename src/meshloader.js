@@ -10,7 +10,7 @@
 /// debugging some values that are correct but just Chrome will disable them
 function loadMesh(pathToModel)
 {
-    pathToModel = typeof pathToModel !== 'undefined' ? pathToModel : "assets/models/Teapot.json";
+    pathToModel = typeof pathToModel !== 'undefined' ? pathToModel : "assets/models/polygon.json";
 
     var request = new XMLHttpRequest();
     request.open("GET", pathToModel, true);
@@ -27,70 +27,77 @@ function loadMesh(pathToModel)
     request.send();
 }
 
-var mesh = { buffers: {} };
+var mesh = { buffers: [], numMeshes: null};
 
 function meshLoader(meshData)
 {
-	/// raw 3D geometric data - positions
-    mesh.buffers.vertexPosition = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, mesh.buffers.vertexPosition);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(meshData.vertexPositions), gl.STATIC_DRAW);
-	mesh.buffers.vertexPosition.itemSize = 3;
-	mesh.buffers.vertexPosition.numItems = meshData.vertexPositions.length / 3;
-
-	/// raw 3D geometric data - normals
-	mesh.buffers.vertexNormal = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, mesh.buffers.vertexNormal);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(meshData.vertexNormals), gl.STATIC_DRAW);
-	mesh.buffers.vertexNormal.itemSize = 3;
-	mesh.buffers.vertexNormal.numItems = meshData.vertexNormals.length / 3;
-
-	/// Make the color procedural, expensive data so later fetch from file
-	var numVertices = mesh.buffers.vertexPosition.numItems;
-	var colorData = [];
-	var redChannel = Math.random();
-	var greenChannel = Math.random();
-	var blueChannel = Math.random();
-	for (var vertex = 0; vertex < numVertices; vertex++)
+	mesh.numMeshes = meshData.model.length;
+	for (var meshID = 0; meshID < mesh.numMeshes; meshID++)
 	{
-		colorData.push(redChannel);
-		colorData.push(greenChannel);
-		colorData.push(blueChannel);
-		colorData.push(1.0);
-	}
-	mesh.buffers.vertexColor = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, mesh.buffers.vertexColor);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorData), gl.STATIC_DRAW);
-	mesh.buffers.vertexColor.itemSize = 4;
-	mesh.buffers.vertexColor.numItems = colorData.length / 4;
-	
-	/// raw 2D image data
-	mesh.buffers.vertexTexture = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, mesh.buffers.vertexTexture);
-	var textures;
-	if (meshData.vertexTextures === undefined || meshData.vertexTextures.length == 0)
-	{
-		var textureData = [];
+		/// Create last mesh to append
+		mesh.buffers.push({});
+		
+		/// raw 3D geometric data - positions
+		mesh.buffers[meshID].vertexPosition = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, mesh.buffers[meshID].vertexPosition);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(meshData.model[meshID].vertexPositions), gl.STATIC_DRAW);
+		mesh.buffers[meshID].vertexPosition.itemSize = 3;
+		mesh.buffers[meshID].vertexPosition.numItems = meshData.model[meshID].vertexPositions.length / 3;
+
+		/// raw 3D geometric data - normals
+		mesh.buffers[meshID].vertexNormal = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, mesh.buffers[meshID].vertexNormal);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(meshData.model[meshID].vertexNormals), gl.STATIC_DRAW);
+		mesh.buffers[meshID].vertexNormal.itemSize = 3;
+		mesh.buffers[meshID].vertexNormal.numItems = meshData.model[meshID].vertexNormals.length / 3;
+
+		/// Make the color procedural, expensive data so later fetch from file
+		var numVertices = mesh.buffers[meshID].vertexPosition.numItems;
+		var colorData = [];
+		var redChannel = Math.random();
+		var greenChannel = Math.random();
+		var blueChannel = Math.random();
 		for (var vertex = 0; vertex < numVertices; vertex++)
 		{
-			/// Fix to actually do the texture mapping!
-			textureData.push(0.0);
-			textureData.push(0.0);
+			colorData.push(redChannel);
+			colorData.push(greenChannel);
+			colorData.push(blueChannel);
+			colorData.push(1.0);
 		}
-		textures = textureData;
+		mesh.buffers[meshID].vertexColor = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, mesh.buffers[meshID].vertexColor);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorData), gl.STATIC_DRAW);
+		mesh.buffers[meshID].vertexColor.itemSize = 4;
+		mesh.buffers[meshID].vertexColor.numItems = colorData.length / 4;
+		
+		/// raw 2D image data
+		mesh.buffers[meshID].vertexTexture = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, mesh.buffers[meshID].vertexTexture);
+		var textures;
+		if (meshData.model[meshID].vertexTextures === undefined || meshData.model[meshID].vertexTextures.length == 0)
+		{
+			var textureData = [];
+			for (var vertex = 0; vertex < numVertices; vertex++)
+			{
+				/// Fix to actually do the texture mapping!
+				textureData.push(0.0);
+				textureData.push(0.0);
+			}
+			textures = textureData;
+		}
+		else
+		{
+			textures = meshData.model[meshID].vertexTextures;
+		}
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures), gl.STATIC_DRAW);
+		mesh.buffers[meshID].vertexTexture.itemSize = 2;
+		mesh.buffers[meshID].vertexTexture.numItems = textures.length / 2;
+		
+		/// 16bit indices 
+		mesh.buffers[meshID].vertexIndices = gl.createBuffer();
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.buffers[meshID].vertexIndices);
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(meshData.model[meshID].indices), gl.STATIC_DRAW);
+		mesh.buffers[meshID].vertexIndices.itemSize = 1;
+		mesh.buffers[meshID].vertexIndices.numItems = meshData.model[meshID].indices.length;
 	}
-	else
-	{
-		textures = meshData.vertexTextures;
-	}
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures), gl.STATIC_DRAW);
-	mesh.buffers.vertexTexture.itemSize = 2;
-	mesh.buffers.vertexTexture.numItems = textures.length / 2;
-	
-	/// 16bit indices 
-	mesh.buffers.vertexIndices = gl.createBuffer();
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.buffers.vertexIndices);
-	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(meshData.indices), gl.STATIC_DRAW);
-	mesh.buffers.vertexIndices.itemSize = 1;
-	mesh.buffers.vertexIndices.numItems = meshData.indices.length;
 }

@@ -53,111 +53,151 @@ function drawScene()
         {
             /// Teapot
             if (currentMeshID == 3)
-                loadMesh("assets/models/Teapot.json");
+                loadMesh("assets/models/teapot.json");
             /// Bunny
             if (currentMeshID == 4)
-                loadMesh("assets/models/Bunny.json");
-            /// Knot
+                loadMesh("assets/models/bunny.json");
+            /// Spider
             if (currentMeshID == 5)
-                loadMesh("assets/models/Knot.json");
+                loadMesh("assets/models/spider.json");
+			/// Bison
+			if (currentMeshID == 6)
+                loadMesh("assets/models/bison.json");
+			/// Duck
+			if (currentMeshID == 7)
+                loadMesh("assets/models/duck.json");
+			/// Jeep
+			if (currentMeshID == 8)
+                loadMesh("assets/models/jeep.json");
         
             localStorage.loadNewModel = 0;
         }
-
-        /// Maybe just use one buffer and padding
-	    var vertexPositionBufferID;
-	    var vertexTextureBufferID;
-	    var vertexNormalBufferID;
-	    var vertexColorBufferID;
-	    var indexBufferID;
-	    var numIndices;
-
-        /// Box
-	    if (currentMeshID == 0)
-	    {
-	        vertexPositionBufferID = box.buffers.vertexPosition;
-	        vertexTextureBufferID = box.buffers.vertexTexture;
-	        vertexNormalBufferID = box.buffers.vertexNormal;
-			vertexColorBufferID = box.buffers.vertexColor;
-	        indexBufferID = box.buffers.vertexIndices;
-	    }
-        /// Sphere
-	    else if (currentMeshID == 1)
-	    {
-	        vertexPositionBufferID = sphere.buffers.vertexPosition;
-	        vertexTextureBufferID = sphere.buffers.vertexTexture;
-	        vertexNormalBufferID = sphere.buffers.vertexNormal;
-			vertexColorBufferID = sphere.buffers.vertexColor;
-	        indexBufferID = sphere.buffers.vertexIndices;
-	    }
-		/// Cylinder
-		else if (currentMeshID == 2)
-		{
-			vertexPositionBufferID = cylinder.buffers.vertexPosition;
-	        vertexTextureBufferID = cylinder.buffers.vertexTexture;
-	        vertexNormalBufferID = cylinder.buffers.vertexNormal;
-			vertexColorBufferID = cylinder.buffers.vertexColor;
-	        indexBufferID = cylinder.buffers.vertexIndices;
+		
+		/// Choose the texture to use
+		var currentTextureID = parseInt(localStorage.getItem("textureID"));
+		
+		var loadedTexture = parseInt(localStorage.getItem("loadNewTexture"));
+	    if (loadedTexture == 1)
+        {
+			if (currentTextureID == 0)
+                loadTexture("assets/textures/image01.jpg");
+			if (currentTextureID == 1)
+                loadTexture("assets/textures/image02.jpg");
+			if (currentTextureID == 2)
+                loadTexture("assets/textures/image03.jpg");
+			
+			localStorage.loadNewTexture = 0;
 		}
-	    /// Any Mesh! (To support reading the material from file ... )
-	    else if (currentMeshID > 2)
-	    {
-	        vertexPositionBufferID = mesh.buffers.vertexPosition;
-	        vertexTextureBufferID = mesh.buffers.vertexTexture;
-	        vertexNormalBufferID = mesh.buffers.vertexNormal;
-			vertexColorBufferID = mesh.buffers.vertexColor;
-	        indexBufferID = mesh.buffers.vertexIndices;
-	    }
-
-	    /// Bind buffers
-        /// Currently supporting (required) : Position, Texture, Normal, Color, Index
-	    {
-	        gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBufferID);
-	        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
-	    }
-	    {
-	        gl.bindBuffer(gl.ARRAY_BUFFER, vertexTextureBufferID);
-	        gl.vertexAttribPointer(shaderProgram.vertexTextureAttribute, 2, gl.FLOAT, false, 0, 0);
-	    }
-	    {
-	        gl.bindBuffer(gl.ARRAY_BUFFER, vertexNormalBufferID);
-	        gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
-	    }
-		{
-	        gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBufferID);
-	        gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
-	    }
-	    {
-	        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBufferID);
-	    }
-
+		
 		/// Bind texture
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, textureID);
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, textureID);
 		
 		/// Set matrices in the GPU
 		setMatrixUniforms();
 
 		/// Set time for animation
 		setUniforms();
-
-		/// Finally, RENDER!
-		/// Remember that if we are not using index buffer we could use glDrawArray(...)
-		/// but check the documentation since we need to repeat data https://www.opengl.org/sdk/docs/man3/xhtml/glDrawArrays.xml
-		/// gl.drawArrays(gl.TRIANGLES, 0, vertexPositionBufferID.numItems);
-
-		/// Check the types of rendering in OpenGL 3.3 >= since I am not sure this is the most efficient
-		/// way for rendering wireframe
-		var renderingType;
-		if (wireframe)
+		
+		/// Grab how many meshes
+		var numMeshes;
+		if (currentMeshID < 3)
 		{
-			renderingType = gl.LINES;
+			/// Procedural
+			numMeshes = 1;
 		}
 		else
 		{
-			renderingType = gl.TRIANGLES;
-		}			
-		gl.drawElements(renderingType, indexBufferID.numItems, gl.UNSIGNED_SHORT, 0);
+			/// File object
+			numMeshes = mesh.numMeshes;
+		}
 		
+		for (var meshID = 0; meshID < numMeshes; meshID++)
+		{
+			/// Maybe just use one buffer and padding
+			var vertexPositionBufferID;
+			var vertexTextureBufferID;
+			var vertexNormalBufferID;
+			var vertexColorBufferID;
+			var indexBufferID;
+			var numIndices;
+
+			/// Box
+			if (currentMeshID == 0)
+			{
+				vertexPositionBufferID = box.buffers[meshID].vertexPosition;
+				vertexTextureBufferID = box.buffers[meshID].vertexTexture;
+				vertexNormalBufferID = box.buffers[meshID].vertexNormal;
+				vertexColorBufferID = box.buffers[meshID].vertexColor;
+				indexBufferID = box.buffers[meshID].vertexIndices;
+			}
+			/// Sphere
+			else if (currentMeshID == 1)
+			{
+				vertexPositionBufferID = sphere.buffers.vertexPosition;
+				vertexTextureBufferID = sphere.buffers.vertexTexture;
+				vertexNormalBufferID = sphere.buffers.vertexNormal;
+				vertexColorBufferID = sphere.buffers.vertexColor;
+				indexBufferID = sphere.buffers.vertexIndices;
+			}
+			/// Cylinder
+			else if (currentMeshID == 2)
+			{
+				vertexPositionBufferID = cylinder.buffers.vertexPosition;
+				vertexTextureBufferID = cylinder.buffers.vertexTexture;
+				vertexNormalBufferID = cylinder.buffers.vertexNormal;
+				vertexColorBufferID = cylinder.buffers.vertexColor;
+				indexBufferID = cylinder.buffers.vertexIndices;
+			}
+			/// Any Mesh! (To support reading the material from file ... )
+			else if (currentMeshID > 2)
+			{
+				vertexPositionBufferID = mesh.buffers[meshID].vertexPosition;
+				vertexTextureBufferID = mesh.buffers[meshID].vertexTexture;
+				vertexNormalBufferID = mesh.buffers[meshID].vertexNormal;
+				vertexColorBufferID = mesh.buffers[meshID].vertexColor;
+				indexBufferID = mesh.buffers[meshID].vertexIndices;
+			}
+
+			/// Bind buffers
+			/// Currently supporting (required) : Position, Texture, Normal, Color, Index
+			{
+				gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBufferID);
+				gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+			}
+			{
+				gl.bindBuffer(gl.ARRAY_BUFFER, vertexTextureBufferID);
+				gl.vertexAttribPointer(shaderProgram.vertexTextureAttribute, 2, gl.FLOAT, false, 0, 0);
+			}
+			{
+				gl.bindBuffer(gl.ARRAY_BUFFER, vertexNormalBufferID);
+				gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
+			}
+			{
+				gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBufferID);
+				gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
+			}
+			{
+				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBufferID);
+			}
+
+			/// Finally, RENDER!
+			/// Remember that if we are not using index buffer we could use glDrawArray(...)
+			/// but check the documentation since we need to repeat data https://www.opengl.org/sdk/docs/man3/xhtml/glDrawArrays.xml
+			/// gl.drawArrays(gl.TRIANGLES, 0, vertexPositionBufferID.numItems);
+
+			/// Check the types of rendering in OpenGL 3.3 >= since I am not sure this is the most efficient
+			/// way for rendering wireframe
+			var renderingType;
+			if (wireframe)
+			{
+				renderingType = gl.LINES;
+			}
+			else
+			{
+				renderingType = gl.TRIANGLES;
+			}			
+			gl.drawElements(renderingType, indexBufferID.numItems, gl.UNSIGNED_SHORT, 0);
+		}
 	}
 }

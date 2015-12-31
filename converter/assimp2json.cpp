@@ -46,7 +46,6 @@
 #include <cmath>
 #include <map>
 
-
 // Create an instance of the Importer class
 Assimp::Importer importer;
 
@@ -59,7 +58,6 @@ const aiScene* scene = NULL;
 void get_bounding_box_for_node (const aiNode* nd, 
     aiVector3D* min, 
     aiVector3D* max)
-    
 {
     aiMatrix4x4 prev;
     unsigned int n = 0, t;
@@ -85,10 +83,8 @@ void get_bounding_box_for_node (const aiNode* nd,
     }
 }
 
-
 void get_bounding_box (aiVector3D* min, aiVector3D* max)
 {
-
     min->x = min->y = min->z =  1e10f;
     max->x = max->y = max->z = -1e10f;
     get_bounding_box_for_node(scene->mRootNode,min,max);
@@ -96,7 +92,6 @@ void get_bounding_box (aiVector3D* min, aiVector3D* max)
 
 const aiScene *Import3DFromFile( const std::string& pFile)
 {
-
     //check if file exists
     std::ifstream fin(pFile.c_str());
     if(!fin.fail()) {
@@ -131,8 +126,8 @@ const aiScene *Import3DFromFile( const std::string& pFile)
     return scene;
 }
 
-void genJSON(const aiScene *sc, std::string outputFile) {
-
+void genJSON(const aiScene *sc, std::string outputFile) 
+{
     std::ofstream f;
     float minX, minY, minZ, maxX, maxY, maxZ;
     float TminX,TminY,TminZ; 
@@ -244,11 +239,11 @@ void genJSON(const aiScene *sc, std::string outputFile) {
     printf("File %s saved\n", outputFile.c_str());
 }
 
-int main(int argc, char **argv) 
+int main(int argc, char ** argv) 
 {
     if (argc != 3) 
     {
-        printf("Usage exe 3dmodelfile jsonfile\n", argv[0]);
+        printf("Usage of program 3dmodelfile jsonfile\n");
         printf("For supported file types please visit Assimp's site\n");
         exit(0);
     }
