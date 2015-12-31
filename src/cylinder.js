@@ -4,10 +4,12 @@
  * @version 1.0.0
  */
  
-var cylinder = { buffers: {} };
+var cylinder = { buffers: null };
 
 function loadCylinder(radius, stacks, height)
 {
+	cylinder.buffers = {};
+	
 	stacks = typeof stacks !== 'undefined' ? stacks : 20;
 	radius = typeof radius !== 'undefined' ? radius : 10.0;
 	height = typeof height !== 'undefined' ? height : 30.0;
@@ -21,8 +23,11 @@ function loadCylinder(radius, stacks, height)
 	var colorData = [];
 	for (var stack = 0; stack < stacks; stack++) 
 	{
-		var theta0 = ((stack + 0) / stacks) * (2.0 * Math.PI);
-		var theta1 = ((stack + 1) / stacks) * (2.0 * Math.PI);
+		var normalizedValue0 = ((stack + 0) / stacks);
+		var normalizedValue1 = ((stack + 1) / stacks);
+		
+		var theta0 = normalizedValue0 * (2.0 * Math.PI);
+		var theta1 = normalizedValue1 * (2.0 * Math.PI);
 		
 		var sinTheta0 = Math.sin(theta0);
 		var cosTheta0 = Math.cos(theta0);
@@ -70,17 +75,17 @@ function loadCylinder(radius, stacks, height)
 		normalData.push(0);
 		normalData.push(z0);
 		
-		textureData.push(0.0);
-		textureData.push(0.0);
-		
-		textureData.push(0.0);
+		textureData.push(normalizedValue0);
 		textureData.push(0.0);
 		
-		textureData.push(0.0);
+		textureData.push(normalizedValue1);
 		textureData.push(0.0);
 		
-		textureData.push(0.0);
-		textureData.push(0.0);
+		textureData.push(normalizedValue1);
+		textureData.push(1.0);
+		
+		textureData.push(normalizedValue0);
+		textureData.push(1.0);
 		
 		colorData.push(0.0);
 		colorData.push(1.0);

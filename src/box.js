@@ -4,10 +4,13 @@
  * @version 1.0.0
  */
 
-var box = { buffers: [], numMeshes: 1};
+var box = { buffers: null, numMeshes: 1, boundingBox: null};
 
 function loadCubeColorPerFace()
 {
+	box.buffers = [];
+	box.boundingBox = [];
+	
 	for (var mesh = 0; mesh < box.numMeshes; mesh++)
 	{
 		/// Create last mesh to append
@@ -24,9 +27,9 @@ function loadCubeColorPerFace()
 		var vertices = [
 		/// front face
 		-halflen, -halflen, -halflen, // v0
-		-halflen, +halflen, -halflen, // v1
+		+halflen, -halflen, -halflen, // v1
 		+halflen, +halflen, -halflen, // v2
-		+halflen, -halflen, -halflen, // v3
+		-halflen, +halflen, -halflen, // v3
 		
 		/// back face
 		-halflen, -halflen, +halflen, // v4
@@ -38,25 +41,25 @@ function loadCubeColorPerFace()
 		-halflen, -halflen, -halflen, // v0
 		-halflen, -halflen, +halflen, // v4
 		-halflen, +halflen, +halflen, // v7 
-		-halflen, +halflen, -halflen, // v1
+		-halflen, +halflen, -halflen, // v3
 		
 		/// left face
-		+halflen, -halflen, -halflen, // v3
-		+halflen, +halflen, -halflen, // v2
-		+halflen, +halflen, +halflen, // v6
+		+halflen, -halflen, -halflen, // v1
 		+halflen, -halflen, +halflen, // v5
+		+halflen, +halflen, +halflen, // v6
+		+halflen, +halflen, -halflen, // v2
 		
 		/// top face
-		-halflen, +halflen, -halflen, // v1
-		+halflen, +halflen, -halflen, // v2
-		+halflen, +halflen, +halflen, // v6
 		-halflen, +halflen, +halflen, // v7
+		+halflen, +halflen, +halflen, // v6
+		+halflen, +halflen, -halflen, // v2
+		-halflen, +halflen, -halflen, // v3
 		
 		/// bottom face
-		-halflen, -halflen, -halflen, // v0
 		-halflen, -halflen, +halflen, // v4
 		+halflen, -halflen, +halflen, // v5
-		+halflen, -halflen, -halflen  // v3
+		+halflen, -halflen, -halflen, // v1
+		-halflen, -halflen, -halflen  // v0
 		];
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 		box.buffers[lastIndexMesh].vertexPosition.itemSize = 3;
@@ -145,10 +148,10 @@ function loadCubeColorPerFace()
 		gl.bindBuffer(gl.ARRAY_BUFFER, box.buffers[lastIndexMesh].vertexTexture);
 
 		var textures = [
-		0.0, 0.0, 
-		1.0, 0.0,
-		1.0, 1.0,
+		1.0, 0.0, 
+		0.0, 0.0,
 		0.0, 1.0,
+		1.0, 1.0,
 		
 		0.0, 0.0,
 		1.0, 0.0,
@@ -160,20 +163,20 @@ function loadCubeColorPerFace()
 		1.0, 1.0,
 		0.0, 1.0,
 		
-		0.0, 0.0,
 		1.0, 0.0,
-		1.0, 1.0,
+		0.0, 0.0,
 		0.0, 1.0,
+		1.0, 1.0,
 		
 		0.0, 0.0,
 		1.0, 0.0,
 		1.0, 1.0,
 		0.0, 1.0,
 		
-		0.0, 0.0,
 		1.0, 0.0,
-		1.0, 1.0,
-		0.0, 1.0
+		0.0, 0.0,
+		0.0, 1.0,
+		1.0, 1.0
 		];
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures), gl.STATIC_DRAW);
 		box.buffers[lastIndexMesh].vertexTexture.itemSize = 2;
@@ -194,5 +197,13 @@ function loadCubeColorPerFace()
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 		box.buffers[lastIndexMesh].vertexIndices.itemSize = 1;
 		box.buffers[lastIndexMesh].vertexIndices.numItems = 36;
+		
+		/// Generate bounding box
+		box.boundingBox.push(-halflen);
+		box.boundingBox.push(-halflen);
+		box.boundingBox.push(-halflen);
+		box.boundingBox.push(+halflen);
+		box.boundingBox.push(+halflen);
+		box.boundingBox.push(+halflen);
 	}
 }

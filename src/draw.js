@@ -63,13 +63,18 @@ function drawScene()
 			/// Bison
 			if (currentMeshID == 6)
                 loadMesh("assets/models/bison.json");
-			/// Duck
+			/// Monkey
 			if (currentMeshID == 7)
-                loadMesh("assets/models/duck.json");
+                loadMesh("assets/models/monkey.json");
 			/// Jeep
 			if (currentMeshID == 8)
                 loadMesh("assets/models/jeep.json");
         
+			
+			setTimeout(function(){
+				setModelMatrix();
+			}, 1000);
+		
             localStorage.loadNewModel = 0;
         }
 		
@@ -85,19 +90,15 @@ function drawScene()
                 loadTexture("assets/textures/image02.jpg");
 			if (currentTextureID == 2)
                 loadTexture("assets/textures/image03.jpg");
+			if (currentTextureID == 3)
+                loadTexture("assets/textures/image04.jpg");
+			if (currentTextureID == 4)
+                loadTexture("assets/textures/image05.jpg");
+			if (currentTextureID == 5)
+                loadTexture("assets/textures/image06.jpg");
 			
 			localStorage.loadNewTexture = 0;
 		}
-		
-		/// Bind texture
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, textureID);
-		
-		/// Set matrices in the GPU
-		setMatrixUniforms();
-
-		/// Set time for animation
-		setUniforms();
 		
 		/// Grab how many meshes
 		var numMeshes;
@@ -111,6 +112,16 @@ function drawScene()
 			/// File object
 			numMeshes = mesh.numMeshes;
 		}
+		
+		/// Bind texture
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, textureID);
+		
+		/// Set matrices in the GPU
+		setMatrixUniforms();
+
+		/// Set time for animation
+		setUniforms();
 		
 		for (var meshID = 0; meshID < numMeshes; meshID++)
 		{
@@ -196,7 +207,7 @@ function drawScene()
 			else
 			{
 				renderingType = gl.TRIANGLES;
-			}			
+			}
 			gl.drawElements(renderingType, indexBufferID.numItems, gl.UNSIGNED_SHORT, 0);
 		}
 	}

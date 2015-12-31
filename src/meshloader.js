@@ -10,7 +10,7 @@
 /// debugging some values that are correct but just Chrome will disable them
 function loadMesh(pathToModel)
 {
-    pathToModel = typeof pathToModel !== 'undefined' ? pathToModel : "assets/models/polygon.json";
+    pathToModel = typeof pathToModel !== 'undefined' ? pathToModel : "assets/models/teapot.json";
 
     var request = new XMLHttpRequest();
     request.open("GET", pathToModel, true);
@@ -27,10 +27,12 @@ function loadMesh(pathToModel)
     request.send();
 }
 
-var mesh = { buffers: [], numMeshes: null};
+var mesh = { buffers: null, numMeshes: null, boundingBox: null};
 
 function meshLoader(meshData)
 {
+	mesh.buffers = [];
+	mesh.boundingBox = [];
 	mesh.numMeshes = meshData.model.length;
 	for (var meshID = 0; meshID < mesh.numMeshes; meshID++)
 	{
@@ -100,4 +102,12 @@ function meshLoader(meshData)
 		mesh.buffers[meshID].vertexIndices.itemSize = 1;
 		mesh.buffers[meshID].vertexIndices.numItems = meshData.model[meshID].indices.length;
 	}
+	
+	/// Generate bounding box
+	mesh.boundingBox.push(meshData.boundingBox[0]);
+	mesh.boundingBox.push(meshData.boundingBox[1]);
+	mesh.boundingBox.push(meshData.boundingBox[2]);
+	mesh.boundingBox.push(meshData.boundingBox[3]);
+	mesh.boundingBox.push(meshData.boundingBox[4]);
+	mesh.boundingBox.push(meshData.boundingBox[5]);
 }

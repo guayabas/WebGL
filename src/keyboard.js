@@ -23,7 +23,7 @@
  	/// http://www.asciitable.com/
  	if (currentlyPressedKey[82])
  	{
- 		mat4.identity(modelMatrix);
+ 		setModelMatrix();
  	}
 
  	if (currentlyPressedKey[87])

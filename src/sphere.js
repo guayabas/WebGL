@@ -4,11 +4,13 @@
  * @version 1.0.0
  */
  
-var sphere = { buffers: {} };
+var sphere = { buffers: null };
 
 /// http://learningwebgl.com/blog/?p=1253
 function loadSphere(radius, latitudeBands, longitudeBands)
 {
+	buffers = {};
+	
     longitudeBands = typeof longitudeBands !== 'undefined' ? longitudeBands : 20;
     latitudeBands = typeof latitudeBands !== 'undefined' ? latitudeBands : 20;
     radius = typeof radius !== 'undefined' ? radius : 10.0;
