@@ -14,7 +14,10 @@
 
     <!-- Responsive HTML -->
     <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
-
+	
+	<!-- Forkme Github -->
+	<link rel="stylesheet" href="libs/forkmegithub/forkmegithub.css">
+	
 <!-- Simple passthrough vertex shader -->
 <script id="shader-vs" type="x-shader/x-vertex">precision mediump float;
 
@@ -340,7 +343,6 @@ void main(void)
             gl.clearColor(1.0, 1.0, 1.0, 1.0);
             gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
             gl.enable(gl.DEPTH_TEST);
-			//gl.enable(gl.CULL_FACE);
             gl.enable(gl.BLEND);
 
             /// Event handlers
@@ -367,13 +369,19 @@ void main(void)
                 mode: "text/x-csrc",
                 lineNumbers: true,
                 matchBrackets: true,
+				theme: "midnight",
+				lineWrapping: true,
+				scrollbarStyle: "overlay"
             });
 
             var textAreaFS = document.getElementById("inputFS");
             editorFS = CodeMirror.fromTextArea(textAreaFS, {
                 mode: "text/x-csrc",
                 lineNumbers: true,
-                matchBrackets: true
+                matchBrackets: true,
+				theme: "midnight",
+				lineWrapping: true,
+				scrollbarStyle: "overlay"
             });
             
             /// The stages here seems to still not work over WebGL
@@ -436,12 +444,25 @@ void main(void)
             var URL = "assets/predefinedTextures.html";
 			settingChildWindow(URL);
         }
+		
+		function showUI()
+		{
+			var URL = "assets/controls.html";
+			settingChildWindow(URL);
+		}
 
     </script>
     <style>
     </style>
 </head>
 <body onload="WebGLInitializer()">
+	<!-- Ribbon for the fork on GitHub -->
+	<div class="github-fork-ribbon-wrapper left">
+		<div class="github-fork-ribbon">
+			<a href="https://github.com/guayabas/WebGL" target="_blank">Fork me on GitHub</a>
+		</div>
+	</div>
+
     <!-- The layout of the web page -->
     <header class="w3-container w3-black w3-center">
         <h5>CGT390 WebGL Programming</h5>
@@ -449,7 +470,7 @@ void main(void)
 
     <!--Our body, the beautiful stuff comes here-->    
 	<div class="w3-container">
-		<div class="w3-row-padding">
+		<div class="w3-row w3-border">
 			<div class="w3-half">
 				<a class="w3-btn w3-teal" style="width:100%" onclick="openWindowPredefinedModels()">Select Model</a>
 			</div>
@@ -459,7 +480,7 @@ void main(void)
 		</div>
 	</div>
 	<div class="w3-container">
-		<div class="w3-row-padding">
+		<div class="w3-row w3-border">
 			<div class="w3-half">
 				<a class="w3-btn w3-teal" style="width:100%" onclick="toggleAnimation()">Animate</a>
 			</div>
@@ -468,9 +489,25 @@ void main(void)
 			</div>
 		</div>
 	</div>
+	<div class="w3-container">
+		<!-- <div class="w3-row w3-border"> -->
+			<div class="w3-quarter">
+				&nbsp;
+			</div>
+			<div class="w3-quarter">
+				&nbsp;
+			</div>
+			<div class="w3-quarter">
+				&nbsp;
+			</div>
+			<div class="w3-quarter">
+				<a class="w3-btn w3-black" style="width:100%" onclick="showUI()">Controls</a>
+			</div>
+		<!-- </div> -->
+	</div>
 	
     <div class="w3-container">
-        <canvas id="WebGLCanvas" style="width:97.25%; margin-left:auto; margin-right:auto; display:block"></canvas>
+		<canvas id="WebGLCanvas" style="width:97.25%; margin-left:auto; margin-right:auto; display:block"></canvas>
     </div>
 
     <div class="w3-container">
@@ -499,10 +536,13 @@ void main(void)
     </footer>
 
     <!--Code syntax highlight http://codemirror.net/-->
+	<link rel="stylesheet" href="libs/codemirror/addon/scroll/simplescrollbars.css">
+	<link rel="stylesheet" href="libs/codemirror/theme/midnight.css">
+    <link rel="stylesheet" href="libs/codemirror/lib/codemirror.css">
+	
     <script src="libs/codemirror/lib/codemirror.js"></script>
     <script src="libs/codemirror/addon/edit/matchbrackets.js"></script>
-    <link rel="stylesheet" href="libs/codemirror/lib/codemirror.css">
+	<script src="libs/codemirror/addon/scroll/simplescrollbars.js"></script>
     <script src="libs/codemirror/mode/clike/clike.js"></script>
-
 </body>
 </html>
