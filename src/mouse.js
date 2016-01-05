@@ -87,11 +87,11 @@
 		distance = Math.sqrt((dx * dx) + (dy * dy));
 		if (distance < lastDistancePointer)
 		{
-			deltaX = -distance / 2;
+			deltaX = -distance * 2;
 		}
 		else
 		{
-			deltaX = +distance / 2;
+			deltaX = +distance * 2;
 		}
 		
 		lastDistancePointer = distance;
