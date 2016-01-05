@@ -18,6 +18,9 @@
 	<!-- Forkme Github -->
 	<link rel="stylesheet" href="libs/forkmegithub/forkmegithub.css">
 	
+	<!-- https://github.com/jquery/PEP -->
+	<script src="https://code.jquery.com/pep/0.4.0/pep.js"></script
+	
 <!-- Simple passthrough vertex shader -->
 <script id="shader-vs" type="x-shader/x-vertex">precision mediump float;
 
@@ -315,7 +318,7 @@ void main(void)
 
         /// WebGL Initializer
         function WebGLInitializer()
-        {
+        {		
             /// Create context
             initGL();
 
@@ -346,17 +349,42 @@ void main(void)
             gl.enable(gl.BLEND);
 
             /// Event handlers
-            document.onmousemove = handleMouseMove;
-            document.onmouseup = handleMouseUp;
             document.onkeydown = handleKeyDown;
             document.onkeyup = handleKeyUp;
+			
+			/// Mouse wheel event
+			var webGLCanvas = document.getElementById("WebGLCanvas");
+			if (webGLCanvas.addEventListener) 
+			{
+				// IE9, Chrome, Safari, Opera
+				webGLCanvas.addEventListener("mousewheel", handleMouseWheel, false);
+				
+				// Firefox
+				webGLCanvas.addEventListener("DOMMouseScroll", handleMouseWheel, false);
+			}
+			else 
+			{
+				// IE 6/7/8
+				webGLCanvas.attachEvent("onmousewheel", handleMouseWheel);
+			}
+			
+			/// Mouse - Touch events
+			webGLCanvas.addEventListener("pointerdown", handleMouseDown, false);
+			webGLCanvas.addEventListener("pointerup", handleMouseUp, false);
+			webGLCanvas.addEventListener("pointermove", handleMouseMove, false);
+			webGLCanvas.addEventListener("pointerout", handleMouseUp, false);
 
             /// Animation
             tick();
         }
-
+		
 		/// HTML initializer
         $(document).ready(function () {
+			/// Disable wheel for the document, leave eventually just
+			/// for the WebGL canvas
+			window.onwheel = function(){ return false; }
+		
+			/// Load the shaders
             $("#inputVS").append($("#shader-vs").text());
             $("#inputFS").append($("#shader-fs-phong-shading").text());
             $("#inputGS").append($("#shader-gs").text());
@@ -490,24 +518,22 @@ void main(void)
 		</div>
 	</div>
 	<div class="w3-container">
-		<!-- <div class="w3-row w3-border"> -->
-			<div class="w3-quarter">
-				&nbsp;
-			</div>
-			<div class="w3-quarter">
-				&nbsp;
-			</div>
-			<div class="w3-quarter">
-				&nbsp;
-			</div>
-			<div class="w3-quarter">
-				<a class="w3-btn w3-black" style="width:100%" onclick="showUI()">Controls</a>
-			</div>
-		<!-- </div> -->
+		<div class="w3-quarter">
+			<a class="w3-btn w3-black" style="width:100%" onclick="showUI()">Controls</a>
+		</div>
+		<div class="w3-quarter">
+			&nbsp;
+		</div>
+		<div class="w3-quarter">
+			&nbsp;
+		</div>
+		<div class="w3-quarter">
+			&nbsp;
+		</div>
 	</div>
 	
     <div class="w3-container">
-		<canvas id="WebGLCanvas" style="width:97.25%; margin-left:auto; margin-right:auto; display:block"></canvas>
+		<canvas id="WebGLCanvas" touch-action="none" style="width:97.25%; margin-left:auto; margin-right:auto; display:block"></canvas>
     </div>
 
     <div class="w3-container">
